@@ -30,57 +30,56 @@
       </div>
 
       <h:form id="reg">
-         <h2>Member Registration</h2>
-         <p>Enforces annotation-based constraints defined on the model class.</p>
+         <h2>Registro de Proveedores</h2>
          <h:panelGrid columns="3" columnClasses="titleCell">
-            <h:outputLabel for="name" value="Name:"/>
-            <h:inputText id="name" value="#{newMember.name}" />
-            <h:message for="name" errorClass="invalid"/>
+            <h:outputLabel for="nombre" value="Nombre:"/>
+            <h:inputText id="nombre" value="#{newProveedor.nombre}" />
+            <h:message for="nombre" errorClass="invalid"/>
 
             <h:outputLabel for="email" value="Email:"/>
-            <h:inputText id="email" value="#{newMember.email}"/>
+            <h:inputText id="email" value="#{newProveedor.email}"/>
             <h:message for="email" errorClass="invalid"/>
 
-            <h:outputLabel for="phoneNumber" value="Phone #:"/>
-            <h:inputText id="phoneNumber" value="#{newMember.phoneNumber}"/>
-            <h:message for="phoneNumber" errorClass="invalid"/>
+            <h:outputLabel for="telefono" value="Teléfono:"/>
+            <h:inputText id="telefono" value="#{newProveedor.telefono}"/>
+            <h:message for="telefono" errorClass="invalid"/>
          </h:panelGrid>
 
          <p>
             <h:panelGrid columns="2">
-               <h:commandButton id="register" action="#{memberController.register}" value="Register" styleClass="register"/>
+               <h:commandButton id="register" action="#{proveedorController.register}" value="Registrar" styleClass="register"/>
                <h:messages styleClass="messages" errorClass="invalid" infoClass="valid" warnClass="warning"
                            globalOnly="true"/>
             </h:panelGrid>
          </p>
       </h:form>
-      <h2>Members</h2>
-      <h:panelGroup rendered="#{empty members}">
-         <em>No registered members.</em>
+      <h2>Proveedores</h2>
+      <h:panelGroup rendered="#{empty proveedores}">
+         <em>No hay proveedores.</em>
       </h:panelGroup>
-      <h:dataTable var="_member" value="#{members}" rendered="#{not empty members}" styleClass="simpletablestyle">
+      <h:dataTable var="_proveedor" value="#{proveedores}" rendered="#{not empty proveedores}" styleClass="simpletablestyle">
          <h:column>
             <f:facet name="header">Id</f:facet>
-                #{_member.id}
+                #{_proveedor.id}
             </h:column>
          <h:column>
-            <f:facet name="header">Name</f:facet>
-                #{_member.name}
+            <f:facet name="header">Nombre</f:facet>
+                #{_proveedor.nombre}
             </h:column>
          <h:column>
             <f:facet name="header">Email</f:facet>
-                #{_member.email}
+                #{_proveedor.email}
             </h:column>
          <h:column>
-            <f:facet name="header">Phone #</f:facet>
-                #{_member.phoneNumber}
+            <f:facet name="header">Teléfono</f:facet>
+                #{_proveedor.telefono}
             </h:column>
          <h:column>
             <f:facet name="header">REST URL</f:facet>
-            <a href="#{request.contextPath}/rest/members/#{_member.id}">/rest/members/#{_member.id}</a>
+            <a href="#{request.contextPath}/rest/proveedores/#{_proveedor.id}">/rest/proveedores/#{_proveedor.id}</a>
          </h:column>
          <f:facet name="footer">
-            REST URL for all members: <a href="#{request.contextPath}/rest/members">/rest/members</a>
+            REST URL for all proveedores: <a href="#{request.contextPath}/rest/proveedores">/rest/proveedores</a>
          </f:facet>
       </h:dataTable>
    </ui:define>
