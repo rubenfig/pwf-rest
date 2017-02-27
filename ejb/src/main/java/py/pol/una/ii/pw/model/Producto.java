@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Digits;
@@ -39,8 +41,21 @@ public class Producto implements Serializable {
     @Digits(fraction = 5, integer = 12)
     @Column(name = "precio")
     private Float precio;
+    
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_proveedor")
+    private Proveedor proveedor;
+    
+    public Proveedor getProveedor() {
+		return proveedor;
+	}
 
-    public Long getId() {
+	public void setProveedor(Proveedor proveedor) {
+		this.proveedor = proveedor;
+	}
+
+	public Long getId() {
         return id;
     }
 

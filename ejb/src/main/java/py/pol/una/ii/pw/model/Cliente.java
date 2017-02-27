@@ -35,7 +35,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @XmlRootElement
-@Table(name = "Registrant", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name = "Cliente", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class Cliente implements Serializable {
     /** Default value included to remove warning. Remove or modify at will. **/
     private static final long serialVersionUID = 1L;
@@ -59,8 +59,20 @@ public class Cliente implements Serializable {
     @Digits(fraction = 0, integer = 12)
     @Column(name = "phone_number")
     private String phoneNumber;
+    
+    
+    @Column(name="cuenta")
+    private Float cuenta=new Float(0.0);
 
-    public Long getId() {
+    public Float getCuenta() {
+    	return cuenta;
+	}
+
+	public void setCuenta(Float cuenta) {
+		this.cuenta = cuenta;
+	}
+
+	public Long getId() {
         return id;
     }
 

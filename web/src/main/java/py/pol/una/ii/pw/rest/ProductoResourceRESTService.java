@@ -99,6 +99,9 @@ public class ProductoResourceRESTService {
         } catch (Exception e) {
             // Handle generic exceptions
             Map<String, String> responseObj = new HashMap<String, String>();
+            if ("Transaction rolled back".equals(e.getMessage())){
+            	responseObj.put("error", "No existe el proveedor");
+            }
             responseObj.put("error", e.getMessage());
             builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
         }
