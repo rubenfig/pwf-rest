@@ -2,16 +2,17 @@ package py.pol.una.ii.pw.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @XmlRootElement
@@ -26,14 +27,17 @@ public class Producto implements Serializable {
 
     @NotNull
     @Size(min = 1, max = 25)
+    @Column(name = "nombre")
     private String nombre;
 
     @NotNull
-    @NotEmpty
+    @Size(min = 1, max = 100)
+    @Column(name = "descripcion")
     private String descripcion;
     
     @NotNull
-    @NotEmpty
+    @Digits(fraction = 5, integer = 12)
+    @Column(name = "precio")
     private Float precio;
 
     public Long getId() {
