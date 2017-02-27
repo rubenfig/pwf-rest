@@ -6,6 +6,7 @@ import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+
 import java.util.logging.Logger;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
@@ -25,5 +26,12 @@ public class ProveedorRegistration {
         log.info("Registrando " + proveedor.getNombre());
         em.persist(proveedor);
         proveedorEventSrc.fire(proveedor);
+    }
+    
+    public void update(Proveedor proveedor) throws Exception {
+    	log.info("Actualizando Proveedor, el nuevo nombre es: " + proveedor.getNombre());
+    	em.merge(proveedor);
+    	em.flush();
+    	proveedorEventSrc.fire(proveedor);
     }
 }
