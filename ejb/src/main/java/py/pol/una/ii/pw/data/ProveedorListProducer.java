@@ -29,12 +29,12 @@ public class ProveedorListProducer {
     }
 
     public void onProveedorListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Proveedor proveedor) {
-        retrieveAllProveedoresOrderedByName();
+        retrieveAllProveedoresOrderedByName(null, null);
     }
 
     @PostConstruct
-    public void retrieveAllProveedoresOrderedByName() {
-        proveedores = proveedorRepository.findAllOrderedByName();
+    public void retrieveAllProveedoresOrderedByName(String nombre, String telefono) {
+        proveedores = proveedorRepository.findAllOrderedByName(nombre, telefono);
     }
 }
 

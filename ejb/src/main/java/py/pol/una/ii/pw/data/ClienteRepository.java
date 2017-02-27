@@ -22,6 +22,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import py.pol.una.ii.pw.model.Cliente;
@@ -47,7 +49,7 @@ public class ClienteRepository {
         return em.createQuery(criteria).getSingleResult();
     }
 
-    public List<Cliente> findAllOrderedByName() {
+    public List<Cliente> findAllOrderedByName(String name, String email, String phoneNumber) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Cliente> criteria = cb.createQuery(Cliente.class);
         Root<Cliente> cliente = criteria.from(Cliente.class);
@@ -55,6 +57,20 @@ public class ClienteRepository {
         // feature in JPA 2.0
         // criteria.select(cliente).orderBy(cb.asc(cliente.get(Cliente_.name)));
         criteria.select(cliente).orderBy(cb.asc(cliente.get("name")));
-        return em.createQuery(criteria).getResultList();
+        if (email != null){
+        	List<Cliente> lista=new ArrayList <Cliente>();
+        	lista.add(findByEmail(email));
+        	return lista;
+        }else{
+        	if (name !=null){
+            	criteria.select(cliente).where(cb.equal(cliente.get("name"), name));
+            }
+        	if (phoneNumber !=null){
+            	criteria.select(cliente).where(cb.equal(cliente.get("phoneNumber"), phoneNumber));
+            }
+        	return em.createQuery(criteria).getResultList();
+        }
+        
+        
     }
 }
