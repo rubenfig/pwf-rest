@@ -195,16 +195,17 @@ public class ProveedorResourceRESTService {
      * or with a map of fields, and related errors.
      */
     @PUT
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response modificarProveedor(Proveedor proveedor) {
+    public Response modificarProveedor(@PathParam("id") long id, Proveedor proveedor) {
 
         Response.ResponseBuilder builder = null;
 
         try {
             // Validates proveedor using bean validation
             validateProveedor(proveedor);
-            
+            proveedor.setId(id);
             registration.update(proveedor);
 
             // Create an "ok" response

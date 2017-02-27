@@ -191,16 +191,17 @@ public class ClienteResourceRESTService {
      * or with a map of fields, and related errors.
      */
     @PUT
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response modificarCliente(Cliente cliente) {
+    public Response modificarCliente(@PathParam("id") long id, Cliente cliente) {
 
         Response.ResponseBuilder builder = null;
 
         try {
             // Validates cliente using bean validation
             validateCliente(cliente);
-            
+            cliente.setId(id);
             registration.update(cliente);
 
             // Create an "ok" response

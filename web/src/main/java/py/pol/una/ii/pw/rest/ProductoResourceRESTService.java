@@ -179,16 +179,17 @@ public class ProductoResourceRESTService {
      * or with a map of fields, and related errors.
      */
     @PUT
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response modificarProducto(Producto producto) {
+    public Response modificarProducto(@PathParam("id") long id, Producto producto) {
 
         Response.ResponseBuilder builder = null;
 
         try {
             // Validates producto using bean validation
             validateProducto(producto);
-            
+            producto.setId(id);
             registration.update(producto);
 
             // Create an "ok" response
