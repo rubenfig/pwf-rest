@@ -28,11 +28,11 @@ public class ClienteListProduce {
     }
 
     public void onClienteListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Cliente cliente) {
-        retrieveAllClientesOrderedByName();
+        retrieveAllClientesOrderedByName(null, null, null);
     }
 
     @PostConstruct
-    public void retrieveAllClientesOrderedByName() {
-        clientes = clienteRepository.findAllOrderedByName();
+    public void retrieveAllClientesOrderedByName(String name, String email, String phoneNumber) {
+        clientes = clienteRepository.findAllOrderedByName(name, email, phoneNumber);
     }
 }

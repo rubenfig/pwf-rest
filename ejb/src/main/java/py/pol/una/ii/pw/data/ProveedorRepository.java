@@ -27,12 +27,26 @@ public class ProveedorRepository {
         criteria.select(proveedor).where(cb.equal(proveedor.get("email"), email));
         return em.createQuery(criteria).getSingleResult();
     }
+    
+    public Proveedor findByNombre(String nombre) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Proveedor> criteria = cb.createQuery(Proveedor.class);
+        Root<Proveedor> proveedor = criteria.from(Proveedor.class);
+        criteria.select(proveedor).where(cb.equal(proveedor.get("nombre"), nombre));
+        return em.createQuery(criteria).getSingleResult();
+    }
 
-    public List<Proveedor> findAllOrderedByName() {
+    public List<Proveedor> findAllOrderedByName(String nombre, String telefono) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Proveedor> criteria = cb.createQuery(Proveedor.class);
         Root<Proveedor> proveedor = criteria.from(Proveedor.class);
         criteria.select(proveedor).orderBy(cb.asc(proveedor.get("nombre")));
+        if (nombre !=null){
+        	criteria.select(proveedor).where(cb.equal(proveedor.get("nombre"), nombre));
+        }
+        if (telefono !=null){
+        	criteria.select(proveedor).where(cb.equal(proveedor.get("telefono"), telefono));
+        }
         return em.createQuery(criteria).getResultList();
     }
 }

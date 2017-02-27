@@ -22,11 +22,20 @@ public class ProductoRepository {
         return em.find(Producto.class, id);
     }
 
-    public List<Producto> findAllOrderedByName() {
+    public List<Producto> findAllOrderedByName(String nombre, String descripcion, Float precio) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Producto> criteria = cb.createQuery(Producto.class);
-        Root<Producto> proveedor = criteria.from(Producto.class);
-        criteria.select(proveedor).orderBy(cb.asc(proveedor.get("nombre")));
+        Root<Producto> producto = criteria.from(Producto.class);
+        criteria.select(producto).orderBy(cb.asc(producto.get("nombre")));
+        if (nombre !=null){
+        	criteria.select(producto).where(cb.equal(producto.get("nombre"), nombre));
+        }
+        if (descripcion !=null){
+        	criteria.select(producto).where(cb.equal(producto.get("descripcion"), descripcion));
+        }
+        if (precio !=null){
+        	criteria.select(producto).where(cb.equal(producto.get("precio"), precio));
+        }
         return em.createQuery(criteria).getResultList();
     }
     

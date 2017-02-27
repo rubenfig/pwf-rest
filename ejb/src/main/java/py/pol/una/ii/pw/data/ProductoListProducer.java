@@ -29,12 +29,12 @@ public class ProductoListProducer {
     }
 
     public void onProveedorListChanged(@Observes(notifyObserver = Reception.IF_EXISTS) final Producto producto) {
-        retrieveAllProductosOrderedByName();
+        retrieveAllProductosOrderedByName(null, null, null);
     }
 
     @PostConstruct
-    public void retrieveAllProductosOrderedByName() {
-        productos = productoRepository.findAllOrderedByName();
+    public void retrieveAllProductosOrderedByName(String nombre, String descripcion, Float telefono) {
+        productos = productoRepository.findAllOrderedByName(nombre, descripcion, telefono);
     }
 }
 
