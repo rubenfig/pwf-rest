@@ -6,9 +6,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+
 import java.util.List;
 
 import py.pol.una.ii.pw.model.Producto;
+
 
 @ApplicationScoped
 public class ProductoRepository {
@@ -26,5 +28,13 @@ public class ProductoRepository {
         Root<Producto> proveedor = criteria.from(Producto.class);
         criteria.select(proveedor).orderBy(cb.asc(proveedor.get("nombre")));
         return em.createQuery(criteria).getResultList();
+    }
+    
+    public Producto findByDescripcion(String descripcion) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Producto> criteria = cb.createQuery(Producto.class);
+        Root<Producto> producto = criteria.from(Producto.class);
+        criteria.select(producto).where(cb.equal(producto.get("descripcion"), descripcion));
+        return em.createQuery(criteria).getSingleResult();
     }
 }
