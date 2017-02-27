@@ -26,4 +26,11 @@ public class ClienteRegistration {
         em.persist(cliente);
         clienteEventSrc.fire(cliente);
     }
+    
+    public void update(Cliente cliente) throws Exception {
+    	log.info("Actualizando Cliente, el nuevo nombre es: " + cliente.getName());
+    	em.merge(cliente);
+    	em.flush();
+    	clienteEventSrc.fire(cliente);
+    }
 }
