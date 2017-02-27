@@ -33,4 +33,10 @@ public class ClienteRegistration {
     	em.flush();
     	clienteEventSrc.fire(cliente);
     }
+    
+    public void remove(Cliente cliente) throws Exception {
+    	cliente = em.merge(cliente);
+    	em.remove(cliente);
+    	em.flush();
+    }
 }

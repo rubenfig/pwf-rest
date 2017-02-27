@@ -34,4 +34,10 @@ public class ProveedorRegistration {
     	em.flush();
     	proveedorEventSrc.fire(proveedor);
     }
+    
+    public void remove(Proveedor proveedor) throws Exception {
+    	proveedor = em.merge(proveedor);
+    	em.remove(proveedor);
+    	em.flush();
+    }
 }
