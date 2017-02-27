@@ -15,6 +15,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -203,5 +204,23 @@ public class ProductoResourceRESTService {
         }
 
         return builder.build();
+    }
+    
+    @DELETE
+    @Path("/{id:[0-9][0-9]*}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Producto deleteProductoById(@PathParam("id") long id) {
+        Producto producto = null;
+    	try {
+        	producto = repository.findById(id);
+        	registration.remove(producto);
+            if (producto == null) {
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
+        } catch (Exception e){
+        	log.info(e.toString());
+        	producto = null;
+        }
+        return producto;
     }
 }

@@ -34,4 +34,10 @@ public class ProductoRegistration {
     	em.flush();
     	productoEventSrc.fire(producto);
     }
+    
+    public void remove(Producto producto) throws Exception {
+    	producto = em.merge(producto);
+    	em.remove(producto);
+    	em.flush();
+    }
 }
