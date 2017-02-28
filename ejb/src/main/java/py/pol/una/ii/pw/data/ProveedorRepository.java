@@ -42,10 +42,14 @@ public class ProveedorRepository {
         Root<Proveedor> proveedor = criteria.from(Proveedor.class);
         criteria.select(proveedor).orderBy(cb.asc(proveedor.get("nombre")));
         if (nombre !=null){
-        	criteria.select(proveedor).where(cb.equal(proveedor.get("nombre"), nombre));
+        	if(telefono!=null){
+        	criteria.where(cb.equal(proveedor.get("nombre"), nombre),
+        			cb.equal(proveedor.get("telefono"), telefono));
+        	}else
+        		criteria.where(cb.equal(proveedor.get("nombre"), nombre));
         }
-        if (telefono !=null){
-        	criteria.select(proveedor).where(cb.equal(proveedor.get("telefono"), telefono));
+        else if (telefono !=null){
+        	criteria.where(cb.equal(proveedor.get("telefono"), telefono));
         }
         return em.createQuery(criteria).getResultList();
     }
