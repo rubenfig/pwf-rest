@@ -23,8 +23,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import py.pol.una.ii.pw.data.ClienteRepository;
+import py.pol.una.ii.pw.data.ProductoRepository;
 import py.pol.una.ii.pw.data.VentaRepository;
+import py.pol.una.ii.pw.model.Cliente;
+import py.pol.una.ii.pw.model.Producto;
 import py.pol.una.ii.pw.model.Venta;
+import py.pol.una.ii.pw.service.ClienteRegistration;
 import py.pol.una.ii.pw.service.VentaRegistration;
 
 @Path("/ventas")
@@ -41,7 +46,18 @@ public class VentaResourceRESTService {
 
     @Inject
     VentaRegistration registration;
-
+    
+    @Inject
+    private ProductoRepository repoProducto;
+    
+    @Inject
+    private ClienteRepository repoCliente;
+    
+    @Inject
+    private ClienteRegistration regCliente;
+    
+    private Cliente cliente;
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Venta> listAllVentas() {
@@ -74,6 +90,19 @@ public class VentaResourceRESTService {
 
             // Create an "ok" response
             builder = Response.ok();
+            
+            //Agregar cuenta de cliente 
+            cliente = venta.getCliente();
+            cliente = repoCliente.findById(cliente.getId());
+            Float cuenta = 0.0F;
+            for(Producto p: venta.getProductos()){
+            	p = repoProducto.findById(p.getId());
+            	cuenta = cuenta + p.getPrecio();
+            }
+            cliente.setCuenta(cuenta);
+            regCliente.update(cliente);
+            
+            
         } catch (ConstraintViolationException ce) {
             // Handle bean validation issues
             builder = createViolationResponse(ce.getConstraintViolations());
