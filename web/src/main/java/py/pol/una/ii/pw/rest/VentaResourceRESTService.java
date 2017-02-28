@@ -104,7 +104,7 @@ public class VentaResourceRESTService {
             builder = Response.ok();
             
             //Agregar cuenta de cliente 
-            Float cuenta = 0.0F;
+            Float cuenta = cliente.getCuenta();
             for(ProductoComprado pc: venta.getProductos()){
             	Producto p = repoProducto.findById(pc.getProducto().getId());
             	cuenta = cuenta + (p.getPrecio()*pc.getCantidad());
