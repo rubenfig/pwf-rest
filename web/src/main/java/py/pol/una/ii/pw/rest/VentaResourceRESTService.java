@@ -28,6 +28,7 @@ import py.pol.una.ii.pw.data.ProductoRepository;
 import py.pol.una.ii.pw.data.VentaRepository;
 import py.pol.una.ii.pw.model.Cliente;
 import py.pol.una.ii.pw.model.Producto;
+import py.pol.una.ii.pw.model.ProductoComprado;
 import py.pol.una.ii.pw.model.Venta;
 import py.pol.una.ii.pw.service.ClienteRegistration;
 import py.pol.una.ii.pw.service.VentaRegistration;
@@ -85,6 +86,17 @@ public class VentaResourceRESTService {
         try {
             // Validates venta using bean validation
             validateVenta(venta);
+            
+            //Anhadir datos de los productos
+            cliente = venta.getCliente();
+            cliente = repoCliente.findById(cliente.getId());
+            venta.setCliente(cliente);
+            int i = 0;
+            for(ProductoComprado pc: venta.getProductos()){
+            	Producto p = repoProducto.findById(pc.getId());
+            	venta.getProductos().get(i).setProducto(p);
+            	i++;
+            }
 
             registration.register(venta);
 
@@ -92,12 +104,10 @@ public class VentaResourceRESTService {
             builder = Response.ok();
             
             //Agregar cuenta de cliente 
-            cliente = venta.getCliente();
-            cliente = repoCliente.findById(cliente.getId());
             Float cuenta = 0.0F;
-            for(Producto p: venta.getProductos()){
-            	p = repoProducto.findById(p.getId());
-            	cuenta = cuenta + p.getPrecio();
+            for(ProductoComprado pc: venta.getProductos()){
+            	Producto p = repoProducto.findById(pc.getProducto().getId());
+            	cuenta = cuenta + (p.getPrecio()*pc.getCantidad());
             }
             cliente.setCuenta(cuenta);
             regCliente.update(cliente);

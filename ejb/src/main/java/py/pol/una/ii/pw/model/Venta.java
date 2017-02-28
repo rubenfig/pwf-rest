@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,10 +33,15 @@ public class Venta implements Serializable {
     @Column(name = "fecha")
     private String fecha;
     
+//    @NotNull
+//    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+//    @JoinTable(name = "ventas_productos", joinColumns = @JoinColumn(name = "id_Venta"), inverseJoinColumns = @JoinColumn(name = "id_Producto"))
+//    private List<Producto> productos;
+    
     @NotNull
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    @JoinTable(name = "ventas_productos", joinColumns = @JoinColumn(name = "id_Venta"), inverseJoinColumns = @JoinColumn(name = "id_Producto"))
-    private List<Producto> productos;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "ventas_productos", joinColumns = @JoinColumn(name = "id_Venta"), inverseJoinColumns = @JoinColumn(name = "id_ProductoComprado"))
+    private List<ProductoComprado> productos;
     
     @NotNull
     @ManyToOne
@@ -58,11 +64,11 @@ public class Venta implements Serializable {
 		this.fecha = fecha;
 	}
 
-	public List<Producto> getProductos() {
+	public List<ProductoComprado> getProductos() {
 		return productos;
 	}
 
-	public void setProductos(List<Producto> productos) {
+	public void setProductos(List<ProductoComprado> productos) {
 		this.productos = productos;
 	}
 

@@ -39,7 +39,9 @@ public class VentaRegistration {
 
     public void register(Venta venta) throws Exception {
         log.info("Registering " + venta.getId());
-        em.persist(venta);
+        em.merge(venta);
+        em.flush();
+        //em.persist(venta);
         ventaEventSrc.fire(venta);
     }
 }
