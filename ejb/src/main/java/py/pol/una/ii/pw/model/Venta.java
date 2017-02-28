@@ -1,19 +1,21 @@
 package py.pol.una.ii.pw.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-
 
 @Entity
 @XmlRootElement
@@ -31,8 +33,9 @@ public class Venta implements Serializable {
     private String fecha;
     
     @NotNull
-    @ManyToMany
-    private ArrayList<Producto> productos;
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinTable(name = "ventas_productos", joinColumns = @JoinColumn(name = "id_Venta"), inverseJoinColumns = @JoinColumn(name = "id_Producto"))
+    private List<Producto> productos;
     
     @NotNull
     @ManyToOne
@@ -55,11 +58,11 @@ public class Venta implements Serializable {
 		this.fecha = fecha;
 	}
 
-	public ArrayList<Producto> getProductos() {
+	public List<Producto> getProductos() {
 		return productos;
 	}
 
-	public void setProductos(ArrayList<Producto> productos) {
+	public void setProductos(List<Producto> productos) {
 		this.productos = productos;
 	}
 
