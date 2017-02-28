@@ -9,7 +9,6 @@ import javax.persistence.criteria.Root;
 
 import java.util.List;
 
-import py.pol.una.ii.pw.model.Producto;
 import py.pol.una.ii.pw.model.ProductoComprado;
 
 

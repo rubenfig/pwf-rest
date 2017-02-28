@@ -149,7 +149,7 @@ public class ProveedorResourceRESTService {
         }
 
         // Check the uniqueness of the email address
-        if (emailAlreadyExists(proveedor.getEmail())) {
+        if (emailAlreadyExists(proveedor.getEmail(),proveedor.getId())) {
             throw new ValidationException("Unique Email Violation");
         }
     }
@@ -180,12 +180,16 @@ public class ProveedorResourceRESTService {
      * @param email The email to check
      * @return True if the email already exists, and false otherwise
      */
-    public boolean emailAlreadyExists(String email) {
+    public boolean emailAlreadyExists(String email, Long id) {
         Proveedor proveedor = null;
         try {
             proveedor = repository.findByEmail(email);
         } catch (NoResultException e) {
             // ignore
+        }
+        if(proveedor !=null){
+	        if (proveedor.getId()==id)
+	        	proveedor=null;
         }
         return proveedor != null;
     }
@@ -204,8 +208,8 @@ public class ProveedorResourceRESTService {
 
         try {
             // Validates proveedor using bean validation
-            validateProveedor(proveedor);
             proveedor.setId(id);
+            validateProveedor(proveedor);
             registration.update(proveedor);
 
             // Create an "ok" response

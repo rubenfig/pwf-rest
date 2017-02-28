@@ -145,7 +145,7 @@ public class ClienteResourceRESTService {
         }
 
         // Check the uniqueness of the email address
-        if (emailAlreadyExists(cliente.getEmail())) {
+        if (emailAlreadyExists(cliente.getEmail(),cliente.getId())) {
             throw new ValidationException("Unique Email Violation");
         }
     }
@@ -176,12 +176,16 @@ public class ClienteResourceRESTService {
      * @param email The email to check
      * @return True if the email already exists, and false otherwise
      */
-    public boolean emailAlreadyExists(String email) {
+    public boolean emailAlreadyExists(String email, Long id) {
         Cliente cliente = null;
         try {
             cliente = repository.findByEmail(email);
         } catch (NoResultException e) {
             // ignore
+        }
+        if(cliente !=null){
+	        if (cliente.getId()==id)
+	        	cliente=null;
         }
         return cliente != null;
     }
@@ -200,8 +204,8 @@ public class ClienteResourceRESTService {
 
         try {
             // Validates cliente using bean validation
-            validateCliente(cliente);
-            cliente.setId(id);
+        	cliente.setId(id);
+        	validateCliente(cliente);
             registration.update(cliente);
 
             // Create an "ok" response
