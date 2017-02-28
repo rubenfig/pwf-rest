@@ -26,23 +26,10 @@ public class ProductoComprado implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
-          
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "compra")
-    private Compra compra;
-    
-    public Compra getCompra() {
-		return compra;
-	}
-
-	public void setCompra(Compra compra) {
-		this.compra = compra;
-	}
 
 	@ManyToOne	
     @JoinColumn(name = "producto")
     private Producto producto;
-    
     
     @Column (name = "cantidad")
     private Integer cantidad;

@@ -41,8 +41,17 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import py.pol.una.ii.pw.data.ClienteRepository;
 import py.pol.una.ii.pw.data.CompraRepository;
+import py.pol.una.ii.pw.data.ProductoCompradoRepository;
+import py.pol.una.ii.pw.data.ProductoRepository;
+import py.pol.una.ii.pw.data.ProveedorRepository;
+import py.pol.una.ii.pw.model.Cliente;
 import py.pol.una.ii.pw.model.Compra;
+import py.pol.una.ii.pw.model.Producto;
+import py.pol.una.ii.pw.model.ProductoComprado;
+import py.pol.una.ii.pw.model.Proveedor;
+import py.pol.una.ii.pw.service.ClienteRegistration;
 import py.pol.una.ii.pw.service.CompraRegistration;
 
 /**
@@ -64,6 +73,15 @@ public class CompraResourceRESTService {
 
     @Inject
     CompraRegistration registration;
+    
+    @Inject
+    private ProductoRepository repoProducto;
+    
+    @Inject
+    private ProductoCompradoRepository repoProductoComprado;
+    
+    @Inject
+    private ProveedorRepository repoProveedor;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -96,6 +114,18 @@ public class CompraResourceRESTService {
         try {
             // Validates compra using bean validation
             validateCompra(compra);
+            
+            //Rellenar los datos necesarios
+            Proveedor proveedor = repoProveedor.findById(compra.getProveedor().getId());
+            compra.setProveedor(proveedor);
+            int i=0;
+            for(ProductoComprado pc: compra.getProductos()){
+            	Producto p= repoProducto.findById(pc.getProducto().getId());
+            	pc.setProducto(p);
+            	compra.getProductos().set(i, pc);
+            	i++;
+            }
+            
 
             registration.register(compra);
 

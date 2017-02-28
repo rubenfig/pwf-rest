@@ -27,16 +27,13 @@ public class CompraRegistration {
     ProductoCompradoRegistration registration;
 
     public void register(Compra compra) throws Exception {
-        em.persist(compra);
-        em.flush();
-        log.info("Registrando " + compra.getId());
-        int n=compra.getProductos().size();
-        for (int i = 0; i < n; i++){
-        	ProductoComprado producto = compra.getProductos().get(i);
-        	registration.register(producto);
-        }
-        em.merge(compra);
-        em.flush();
+    	log.info("Registrando " + compra.getId());
+    	em.persist(compra);
+        //em.flush();
+        //log.info("Registrando " + compra.getId());
+
+        //em.merge(compra);
+        //em.flush();
         compraEventSrc.fire(compra);
     }
     
