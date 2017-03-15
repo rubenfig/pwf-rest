@@ -1,8 +1,5 @@
 *target*
-*.jar
-*.war
-*.ear
-*.class
+
 
 # eclipse specific git ignore
 *.pydevproject
@@ -26,3 +23,8 @@ local.properties
 # Locally stored "Eclipse launch configurations"
 *.launch
 
+# IntelliJ git ignore
+.idea
+*.iml
+lib/
+web/src/test/
