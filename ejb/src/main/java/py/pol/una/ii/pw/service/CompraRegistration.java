@@ -3,6 +3,7 @@ package py.pol.una.ii.pw.service;
 import py.pol.una.ii.pw.model.Compra;
 import py.pol.una.ii.pw.model.ProductoComprado;
 
+import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -11,7 +12,7 @@ import javax.persistence.EntityManager;
 import java.util.logging.Logger;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
-@Stateless
+@Stateful
 public class CompraRegistration {
 
     @Inject
@@ -35,6 +36,10 @@ public class CompraRegistration {
         //em.merge(compra);
         //em.flush();
         compraEventSrc.fire(compra);
+    }
+
+    public void completarCompra(Compra compra) throws Exception {
+
     }
     
     public void update(Compra compra) throws Exception {

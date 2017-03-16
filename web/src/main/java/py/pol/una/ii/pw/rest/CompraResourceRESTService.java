@@ -22,9 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
@@ -38,7 +41,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
 import py.pol.una.ii.pw.data.ClienteRepository;
@@ -83,6 +88,9 @@ public class CompraResourceRESTService {
     @Inject
     private ProveedorRepository repoProveedor;
 
+    @Context
+    private HttpServletRequest request;
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Compra> listAllCompras() {
@@ -114,7 +122,28 @@ public class CompraResourceRESTService {
         try {
             // Validates compra using bean validation
             validateCompra(compra);
-            
+            CompraRegistration bean = (CompraRegistration) request.getSession().getAttribute("compra");
+            System.out.println("Sesion numero:"+request.getSession().getId());
+            if(bean == null){
+                // EJB is not present in the HTTP session
+                // so let's fetch a new one from the container
+                try {
+                    InitialContext ic = new InitialContext();
+                    bean = (CompraRegistration)
+                            ic.lookup("java:global/EjbJaxRS-ear/EjbJaxRS-ejb/CompraRegistration");
+
+                    // put EJB in HTTP session for future servlet calls
+                    request.getSession().setAttribute(
+                            "compra",
+                            bean);
+
+                    System.out.println("Creo el bean");
+                } catch (NamingException e) {
+                    System.out.println("No creo el bean");
+                    throw new ServletException(e);
+
+                }
+            }
             //Rellenar los datos necesarios
             Proveedor proveedor = repoProveedor.findById(compra.getProveedor().getId());
             compra.setProveedor(proveedor);
