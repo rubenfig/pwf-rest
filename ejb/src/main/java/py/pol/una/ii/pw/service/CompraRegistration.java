@@ -1,18 +1,24 @@
 package py.pol.una.ii.pw.service;
 
+import py.pol.una.ii.pw.data.ProveedorRepository;
 import py.pol.una.ii.pw.model.Compra;
+import py.pol.una.ii.pw.model.Producto;
 import py.pol.una.ii.pw.model.ProductoComprado;
+import py.pol.una.ii.pw.model.Proveedor;
 
-import javax.ejb.Stateful;
-import javax.ejb.Stateless;
+import javax.annotation.Resource;
+import javax.ejb.*;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.transaction.UserTransaction;
 
 import java.util.logging.Logger;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
 @Stateful
+@TransactionManagement(TransactionManagementType.BEAN)
 public class CompraRegistration {
 
     @Inject
@@ -23,23 +29,38 @@ public class CompraRegistration {
 
     @Inject
     private Event<Compra> compraEventSrc;
-    
+
+    @Inject
+    private ProveedorRepository repoProveedor;
+
     @Inject
     ProductoCompradoRegistration registration;
 
-    public void register(Compra compra) throws Exception {
-    	log.info("Registrando " + compra.getId());
-    	em.persist(compra);
-        //em.flush();
-        //log.info("Registrando " + compra.getId());
+    @Resource
+    private EJBContext context;
 
-        //em.merge(compra);
-        //em.flush();
+    private UserTransaction tx;
+
+    private Compra compra_actual;
+
+    public void register(Compra compra) throws Exception {
+    	log.info("Registrando compra de:" + compra.getProveedor());
+    	tx=context.getUserTransaction();
+    	compra_actual=compra;
+    	tx.begin();
+    	em.persist(compra_actual);
         compraEventSrc.fire(compra);
     }
 
-    public void completarCompra(Compra compra) throws Exception {
+    public void agregarCarrito (ProductoComprado pc) throws Exception{
+        compra_actual.getProductos().add(pc);
+    }
 
+    public void completarCompra() throws Exception {
+        tx.commit();
+    }
+    public void cancelarCompra() throws Exception {
+        tx.rollback();
     }
     
     public void update(Compra compra) throws Exception {

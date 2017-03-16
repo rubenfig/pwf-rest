@@ -144,16 +144,7 @@ public class CompraResourceRESTService {
 
                 }
             }
-            //Rellenar los datos necesarios
-            Proveedor proveedor = repoProveedor.findById(compra.getProveedor().getId());
-            compra.setProveedor(proveedor);
-            int i=0;
-            for(ProductoComprado pc: compra.getProductos()){
-            	Producto p= repoProducto.findById(pc.getProducto().getId());
-            	pc.setProducto(p);
-            	compra.getProductos().set(i, pc);
-            	i++;
-            }
+
             
 
             registration.register(compra);
