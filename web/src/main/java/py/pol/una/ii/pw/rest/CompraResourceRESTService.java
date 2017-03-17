@@ -137,7 +137,7 @@ public class CompraResourceRESTService {
                             "compra",
                             bean);
                     bean.register(compra);
-                    System.out.println("Creo el bean");
+                    System.out.println("Creo el bean: "+request.getSession().getId());
                 } catch (NamingException e) {
                     System.out.println("No creo el bean");
                     throw new ServletException(e);
@@ -264,6 +264,7 @@ public class CompraResourceRESTService {
             if(bean != null){
                 bean.cancelarCompra();
                 request.getSession().setAttribute("compra",null);
+                System.out.println("Destruyo el bean: "+request.getSession().getId());
                 builder = Response.ok();
             }else{
                 Map<String, String> responseObj = new HashMap<String, String>();
