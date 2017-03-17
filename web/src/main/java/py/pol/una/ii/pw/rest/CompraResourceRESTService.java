@@ -136,18 +136,21 @@ public class CompraResourceRESTService {
                     request.getSession().setAttribute(
                             "compra",
                             bean);
-
+                    bean.register(compra);
                     System.out.println("Creo el bean");
                 } catch (NamingException e) {
                     System.out.println("No creo el bean");
                     throw new ServletException(e);
 
                 }
+            }else{
+                Map<String, String> response = new HashMap<String, String>();
+                response.put("error", "ya existe la compra");
             }
 
             
 
-            registration.register(compra);
+
 
             // Create an "ok" response
             builder = Response.ok();
@@ -163,6 +166,127 @@ public class CompraResourceRESTService {
 
         return builder.build();
     }
+
+
+    /**
+     * Creates a new compra from the values provided. Performs validation, and will return a JAX-RS response with either 200 ok,
+     * or with a map of fields, and related errors.
+     */
+    @POST
+    @Path("/agregar")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response agregarCarrito(ProductoComprado pc) {
+
+        Response.ResponseBuilder builder = null;
+
+        try {
+            // Validates compra using bean validation
+            CompraRegistration bean = (CompraRegistration) request.getSession().getAttribute("compra");
+            System.out.println("Sesion numero:"+request.getSession().getId());
+            if(bean != null){
+                bean.agregarCarrito(pc);
+                builder = Response.ok();
+            }else{
+
+                Map<String, String> responseObj = new HashMap<String, String>();
+                responseObj.put("error", "No existe la compra");
+                builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+            }
+
+
+            // Create an "ok" response
+
+        } catch (ConstraintViolationException ce) {
+            // Handle bean validation issues
+            builder = createViolationResponse(ce.getConstraintViolations());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<String, String>();
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+        }
+
+        return builder.build();
+    }
+
+
+    @POST
+    @Path("/confirmar")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response confirmar() {
+
+        Response.ResponseBuilder builder = null;
+
+        try {
+            // Validates compra using bean validation
+            CompraRegistration bean = (CompraRegistration) request.getSession().getAttribute("compra");
+            System.out.println("Sesion numero:"+request.getSession().getId());
+            if(bean != null){
+                bean.completarCompra();
+                builder = Response.ok();
+            }else{
+                Map<String, String> responseObj = new HashMap<String, String>();
+                responseObj.put("error", "No existe la compra");
+                builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+            }
+
+
+            // Create an "ok" response
+
+        } catch (ConstraintViolationException ce) {
+            // Handle bean validation issues
+            builder = createViolationResponse(ce.getConstraintViolations());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<String, String>();
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+        }
+
+        return builder.build();
+    }
+
+
+    @POST
+    @Path("/cancelar")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response cancelar() {
+
+        Response.ResponseBuilder builder = null;
+
+        try {
+            // Validates compra using bean validation
+            CompraRegistration bean = (CompraRegistration) request.getSession().getAttribute("compra");
+            System.out.println("Sesion numero:"+request.getSession().getId());
+            if(bean != null){
+                bean.cancelarCompra();
+                request.getSession().setAttribute("compra",null);
+                builder = Response.ok();
+            }else{
+                Map<String, String> responseObj = new HashMap<String, String>();
+                responseObj.put("error", "No existe la compra");
+                builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+            }
+
+
+            // Create an "ok" response
+
+        } catch (ConstraintViolationException ce) {
+            // Handle bean validation issues
+            builder = createViolationResponse(ce.getConstraintViolations());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<String, String>();
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+        }
+
+        return builder.build();
+    }
+
 
     /**
      * <p>

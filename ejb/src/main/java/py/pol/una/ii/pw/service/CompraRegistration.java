@@ -6,6 +6,7 @@ import py.pol.una.ii.pw.model.Producto;
 import py.pol.una.ii.pw.model.ProductoComprado;
 import py.pol.una.ii.pw.model.Proveedor;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.*;
 import javax.enterprise.event.Event;
@@ -43,6 +44,11 @@ public class CompraRegistration {
 
     private Compra compra_actual;
 
+    @PostConstruct
+    public void initializateBean(){
+        compra_actual = new Compra();
+    }
+
     public void register(Compra compra) throws Exception {
     	log.info("Registrando compra de:" + compra.getProveedor());
     	tx=context.getUserTransaction();
@@ -54,11 +60,14 @@ public class CompraRegistration {
 
     public void agregarCarrito (ProductoComprado pc) throws Exception{
         compra_actual.getProductos().add(pc);
+        em.persist(compra_actual);
     }
 
     public void completarCompra() throws Exception {
         tx.commit();
     }
+
+    @Remove
     public void cancelarCompra() throws Exception {
         tx.rollback();
     }
