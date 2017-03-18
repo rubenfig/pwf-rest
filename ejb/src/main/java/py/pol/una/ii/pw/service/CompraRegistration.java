@@ -4,7 +4,6 @@ import py.pol.una.ii.pw.data.ProveedorRepository;
 import py.pol.una.ii.pw.model.Compra;
 import py.pol.una.ii.pw.model.Producto;
 import py.pol.una.ii.pw.model.ProductoComprado;
-import py.pol.una.ii.pw.model.Proveedor;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -12,13 +11,17 @@ import javax.ejb.*;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.transaction.UserTransaction;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
 @Stateful
+@StatefulTimeout(value = 15, unit = TimeUnit.MINUTES)
 @TransactionManagement(TransactionManagementType.BEAN)
 public class CompraRegistration {
 
@@ -50,6 +53,12 @@ public class CompraRegistration {
     }
 
     public void register(Compra compra) throws Exception {
+        //Se ingresa la fecha en un formato lindo
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+        Date today = Calendar.getInstance().getTime();
+        String reportDate = df.format(today);
+        compra.setFecha(reportDate);
+
     	log.info("Registrando compra de:" + compra.getProveedor());
     	tx=context.getUserTransaction();
     	compra_actual=compra;
@@ -61,6 +70,20 @@ public class CompraRegistration {
     public void agregarCarrito (ProductoComprado pc) throws Exception{
         compra_actual.getProductos().add(pc);
         em.persist(compra_actual);
+    }
+
+    public void removeItem(Producto p) throws Exception{
+        int cont = 0;
+        boolean bandera = false;
+        for(ProductoComprado pc: compra_actual.getProductos()){
+            if(p.getId().equals(pc.getProducto().getId())){
+                compra_actual.getProductos().remove(cont);
+                em.persist(compra_actual);
+                bandera = true;
+            }
+        }
+        if(!bandera)
+            log.info("No existe el item que se desea eliminar");
     }
 
     @Remove

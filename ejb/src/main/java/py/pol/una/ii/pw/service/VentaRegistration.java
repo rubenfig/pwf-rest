@@ -27,10 +27,16 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.UserTransaction;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
 @Stateful
+@StatefulTimeout(value = 15, unit = TimeUnit.MINUTES)
 @TransactionManagement(TransactionManagementType.BEAN)
 public class VentaRegistration {
 
@@ -67,6 +73,12 @@ public class VentaRegistration {
     }
 
     public void register(Venta venta) throws Exception {
+        //Se ingresa la fecha en un formato lindo
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+        Date today = Calendar.getInstance().getTime();
+        String reportDate = df.format(today);
+        venta.setFecha(reportDate);
+
         log.info("Registrando venta de:" + venta.getCliente());
         tx=context.getUserTransaction();
         venta_actual=venta;
@@ -78,6 +90,20 @@ public class VentaRegistration {
     public void agregarCarrito (ProductoComprado pc) throws Exception{
         venta_actual.getProductos().add(pc);
         em.persist(venta_actual);
+    }
+
+    public void removeItem(Producto p) throws Exception{
+        int cont = 0;
+        boolean bandera = false;
+        for(ProductoComprado pc: venta_actual.getProductos()){
+            if(p.getId().equals(pc.getProducto().getId())){
+                venta_actual.getProductos().remove(cont);
+                em.persist(venta_actual);
+                bandera = true;
+            }
+        }
+        if(!bandera)
+            log.info("No existe el item que se desea eliminar");
     }
 
     @Remove

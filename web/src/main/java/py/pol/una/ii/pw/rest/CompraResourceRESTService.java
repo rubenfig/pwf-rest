@@ -16,11 +16,7 @@
  */
 package py.pol.una.ii.pw.rest;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -43,20 +39,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
-import py.pol.una.ii.pw.data.ClienteRepository;
 import py.pol.una.ii.pw.data.CompraRepository;
 import py.pol.una.ii.pw.data.ProductoCompradoRepository;
 import py.pol.una.ii.pw.data.ProductoRepository;
 import py.pol.una.ii.pw.data.ProveedorRepository;
-import py.pol.una.ii.pw.model.Cliente;
 import py.pol.una.ii.pw.model.Compra;
 import py.pol.una.ii.pw.model.Producto;
 import py.pol.una.ii.pw.model.ProductoComprado;
-import py.pol.una.ii.pw.model.Proveedor;
-import py.pol.una.ii.pw.service.ClienteRegistration;
 import py.pol.una.ii.pw.service.CompraRegistration;
 
 /**
@@ -147,11 +138,6 @@ public class CompraResourceRESTService {
                 Map<String, String> response = new HashMap<String, String>();
                 response.put("error", "ya existe la compra");
             }
-
-            
-
-
-
             // Create an "ok" response
             builder = Response.ok();
         } catch (ConstraintViolationException ce) {
@@ -193,10 +179,41 @@ public class CompraResourceRESTService {
                 responseObj.put("error", "No existe la compra");
                 builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
             }
-
-
             // Create an "ok" response
+        } catch (ConstraintViolationException ce) {
+            // Handle bean validation issues
+            builder = createViolationResponse(ce.getConstraintViolations());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<String, String>();
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+        }
 
+        return builder.build();
+    }
+
+    @POST
+    @Path("/remover")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removerItem(Producto p) {
+
+        Response.ResponseBuilder builder = null;
+
+        try {
+            // Validates compra usfaing bean validation
+            CompraRegistration bean = (CompraRegistration) request.getSession().getAttribute("compra");
+            System.out.println("Sesion numero:"+request.getSession().getId());
+            if(bean != null){
+                bean.removeItem(p);
+                builder = Response.ok();
+            }else{
+                Map<String, String> responseObj = new HashMap<String, String>();
+                responseObj.put("error", "No existe la compra");
+                builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+            }
+            // Create an "ok" response
         } catch (ConstraintViolationException ce) {
             // Handle bean validation issues
             builder = createViolationResponse(ce.getConstraintViolations());
@@ -231,10 +248,7 @@ public class CompraResourceRESTService {
                 responseObj.put("error", "No existe la compra");
                 builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
             }
-
-
             // Create an "ok" response
-
         } catch (ConstraintViolationException ce) {
             // Handle bean validation issues
             builder = createViolationResponse(ce.getConstraintViolations());
@@ -271,10 +285,7 @@ public class CompraResourceRESTService {
                 responseObj.put("error", "No existe la compra");
                 builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
             }
-
-
             // Create an "ok" response
-
         } catch (ConstraintViolationException ce) {
             // Handle bean validation issues
             builder = createViolationResponse(ce.getConstraintViolations());
