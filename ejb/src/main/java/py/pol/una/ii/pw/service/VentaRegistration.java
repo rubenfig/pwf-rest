@@ -16,16 +16,22 @@
  */
 package py.pol.una.ii.pw.service;
 
-import py.pol.una.ii.pw.model.Venta;
+import py.pol.una.ii.pw.data.ClienteRepository;
+import py.pol.una.ii.pw.data.ProductoRepository;
+import py.pol.una.ii.pw.model.*;
 
-import javax.ejb.Stateless;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.ejb.*;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.transaction.UserTransaction;
 import java.util.logging.Logger;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
-@Stateless
+@Stateful
+@TransactionManagement(TransactionManagementType.BEAN)
 public class VentaRegistration {
 
     @Inject
@@ -37,11 +43,67 @@ public class VentaRegistration {
     @Inject
     private Event<Venta> ventaEventSrc;
 
+    @Inject
+    private ClienteRepository repoCliente;
+
+    @Inject
+    private ClienteRegistration regCliente;
+
+    @Inject
+    private ProductoRepository repoProducto;
+
+    private Cliente cliente;
+
+    @Resource
+    private EJBContext context;
+
+    private UserTransaction tx;
+
+    private Venta venta_actual;
+
+    @PostConstruct
+    public void initializateBean(){
+        venta_actual = new Venta();
+    }
+
     public void register(Venta venta) throws Exception {
-        log.info("Registering " + venta.getId());
-        em.merge(venta);
-        em.flush();
-        //em.persist(venta);
+        log.info("Registrando venta de:" + venta.getCliente());
+        tx=context.getUserTransaction();
+        venta_actual=venta;
+        tx.begin();
+        em.persist(venta_actual);
         ventaEventSrc.fire(venta);
     }
+
+    public void agregarCarrito (ProductoComprado pc) throws Exception{
+        venta_actual.getProductos().add(pc);
+        em.persist(venta_actual);
+    }
+
+    @Remove
+    public void completarVenta()  {
+        try {
+            tx.commit();
+            //Agregar cuenta de cliente
+            Float cuenta = cliente.getCuenta();
+            for (ProductoComprado pc : venta_actual.getProductos()) {
+                Producto p = repoProducto.findById(pc.getProducto().getId());
+                cuenta = cuenta + (p.getPrecio() * pc.getCantidad());
+            }
+            cliente.setCuenta(cuenta);
+            regCliente.update(cliente);
+
+        } catch (Exception e){
+            System.out.println("Fallo el commit");
+        }
+
+    }
+
+    @Remove
+    public void cancelarVenta() throws Exception {
+        tx.rollback();
+    }
+
+
+
 }

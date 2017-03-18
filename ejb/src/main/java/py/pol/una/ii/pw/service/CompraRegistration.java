@@ -63,6 +63,7 @@ public class CompraRegistration {
         em.persist(compra_actual);
     }
 
+    @Remove
     public void completarCompra() throws Exception {
         tx.commit();
     }
