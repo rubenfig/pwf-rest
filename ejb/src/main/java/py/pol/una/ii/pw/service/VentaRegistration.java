@@ -110,6 +110,7 @@ public class VentaRegistration {
     public void completarVenta()  {
         try {
             tx.commit();
+            cliente = repoCliente.findById(venta_actual.getCliente().getId());
             //Agregar cuenta de cliente
             Float cuenta = cliente.getCuenta();
             for (ProductoComprado pc : venta_actual.getProductos()) {
