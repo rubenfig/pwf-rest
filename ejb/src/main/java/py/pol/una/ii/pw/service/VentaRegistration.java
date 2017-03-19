@@ -93,13 +93,15 @@ public class VentaRegistration {
     }
 
     public void removeItem(Producto p) throws Exception{
-        int cont = 0;
         boolean bandera = false;
-        for(ProductoComprado pc: venta_actual.getProductos()){
+        int n=venta_actual.getProductos().size();
+        for(int i=0;i<n;i++){
+            ProductoComprado pc = venta_actual.getProductos().get(i);
             if(p.getId().equals(pc.getProducto().getId())){
-                venta_actual.getProductos().remove(cont);
+                venta_actual.getProductos().remove(i);
                 em.persist(venta_actual);
                 bandera = true;
+                n--;
             }
         }
         if(!bandera)

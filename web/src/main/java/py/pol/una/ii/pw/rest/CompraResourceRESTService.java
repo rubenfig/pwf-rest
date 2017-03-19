@@ -242,6 +242,9 @@ public class CompraResourceRESTService {
             System.out.println("Sesion numero:"+request.getSession().getId());
             if(bean != null){
                 bean.completarCompra();
+                request.getSession().setAttribute(
+                        "compra",
+                        null);
                 builder = Response.ok();
             }else{
                 Map<String, String> responseObj = new HashMap<String, String>();

@@ -176,6 +176,9 @@ public class VentaResourceRESTService {
             System.out.println("Sesion numero:"+request.getSession().getId());
             if(bean != null){
                 bean.completarVenta();
+                request.getSession().setAttribute(
+                        "venta",
+                        null);
                 builder = Response.ok();
             }else{
                 Map<String, String> responseObj = new HashMap<String, String>();
@@ -208,15 +211,15 @@ public class VentaResourceRESTService {
         Response.ResponseBuilder builder = null;
 
         try {
-            // Validates compra usfaing bean validation
-            VentaRegistration bean = (VentaRegistration) request.getSession().getAttribute("compra");
+            // Validates venta usfaing bean validation
+            VentaRegistration bean = (VentaRegistration) request.getSession().getAttribute("venta");
             System.out.println("Sesion numero:"+request.getSession().getId());
             if(bean != null){
                 bean.removeItem(p);
                 builder = Response.ok();
             }else{
                 Map<String, String> responseObj = new HashMap<String, String>();
-                responseObj.put("error", "No existe la compra");
+                responseObj.put("error", "No existe la venta");
                 builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
             }
             // Create an "ok" response
