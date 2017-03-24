@@ -55,6 +55,7 @@ import py.pol.una.ii.pw.data.ProveedorRepository;
 import py.pol.una.ii.pw.model.Compra;
 import py.pol.una.ii.pw.model.Producto;
 import py.pol.una.ii.pw.model.ProductoComprado;
+import py.pol.una.ii.pw.service.CompraMasivaRegistration;
 import py.pol.una.ii.pw.service.CompraRegistration;
 
 /**
@@ -85,6 +86,9 @@ public class CompraResourceRESTService {
     
     @Inject
     private ProveedorRepository repoProveedor;
+
+    @Inject
+    CompraMasivaRegistration registrationMasivo;
 
     @Context
     private HttpServletRequest request;
@@ -171,6 +175,7 @@ public class CompraResourceRESTService {
     @Consumes("multipart/form-data")
     public Response uploadFile(MultipartFormDataInput input) {
 
+        Response.ResponseBuilder builder = null;
         String fileName = "";
 
         Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
@@ -192,6 +197,11 @@ public class CompraResourceRESTService {
                 fileName = UPLOADED_FILE_PATH + fileName;
 
                 writeFile(bytes,fileName);
+
+                registrationMasivo.registerComprasMasivas(fileName);
+
+                // Create an "ok" response
+                builder = Response.ok();
 
                 log.info("La compra masiva se realizó con exito");
 
