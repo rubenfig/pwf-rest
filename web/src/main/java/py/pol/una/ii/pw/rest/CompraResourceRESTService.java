@@ -200,13 +200,15 @@ public class CompraResourceRESTService {
 
                 registrationMasivo.registerComprasMasivas(fileName);
 
+
+
                 // Create an "ok" response
                 builder = Response.ok();
 
-                log.info("La compra masiva se realizó con exito");
-
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                deleteFile(fileName);
             }
 
         }
@@ -257,7 +259,21 @@ public class CompraResourceRESTService {
 
     }
 
+    //eliminar archivo que se utilizo para las compras masivas
+    private void deleteFile(String path){
+        try{
+            File file = new File(path);
+            if(file.delete()){
+                log.info(file.getName() + " fue eliminado!");
+            }else{
+                log.info("No se pudo eliminar el archivo intermedio");
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            log.info("No se pudo eliminar el archivo intermedio");
+        }
 
+    }
     /**
      * Creates a new compra from the values provided. Performs validation, and will return a JAX-RS response with either 200 ok,
      * or with a map of fields, and related errors.
