@@ -42,6 +42,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.*;
 
+import com.google.gson.Gson;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import py.pol.una.ii.pw.data.CompraRepository;
@@ -575,18 +576,15 @@ public class CompraResourceRESTService {
                     while ( recordSize > 0 ) {
                         // Get the paged data set from the DB
                         List<Compra> compras = listAllCompraEntities( recordPosition, recordsPerRoundTrip );
-
+                        Gson gs = new Gson();
                         for ( Compra compra : compras ) {
                             if ( recordPosition > 0 ) {
                                 writer.print( "," );
                             }
 
                             // Stream the data in Json object format
-                            writer.print( Json.createObjectBuilder()
-                                    .add( "id", compra.getId() )
-                                    .add( "fecha", compra.getFecha() )
-                                    .add(" proveedor", compra.getProveedor().getId())
-                                    .build().toString() );
+
+                            writer.print(gs.toJson(compra));
 
                             // Increase the recordPosition for every record streamed
                             recordPosition++;
