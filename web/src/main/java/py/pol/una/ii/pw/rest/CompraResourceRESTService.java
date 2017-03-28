@@ -16,16 +16,15 @@
  */
 package py.pol.una.ii.pw.rest;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.json.Json;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -41,10 +40,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -523,5 +519,87 @@ public class CompraResourceRESTService {
         	compra = null;
         }
         return compra;
+    }
+
+    @Inject
+    private EntityManager entityManager;
+
+    protected EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    private int queryCompraRecordsSize() {
+        return getEntityManager().createNamedQuery( "Compra.queryRecordsSize", Long.class )
+                .getSingleResult().intValue();
+    }
+
+    private List<Compra> listAllCompraEntities(int recordPosition, int recordsPerRoundTrip ) {
+        return getEntityManager().createNamedQuery( "Compra.listAll" )
+                .setFirstResult( recordPosition )
+                .setMaxResults( recordsPerRoundTrip )
+                .getResultList();
+    }
+
+    /**
+     * Say "NO" to response caching
+     */
+    protected Response.ResponseBuilder getNoCacheResponseBuilder( Response.Status status ) {
+        CacheControl cc = new CacheControl();
+        cc.setNoCache( true );
+        cc.setMaxAge( -1 );
+        cc.setMustRevalidate( true );
+
+        return Response.status( status ).cacheControl( cc );
+    }
+
+    @GET
+    @Path( "/list-all" )
+    @Produces( "application/json" )
+    //@TransactionAttribute( TransactionAttributeType.NEVER )
+    public Response streamGenerateCompras() {
+
+        return getNoCacheResponseBuilder( Response.Status.OK ).entity( new StreamingOutput() {
+
+            // Instruct how StreamingOutput's write method is to stream the data
+            @Override
+            public void write( OutputStream os ) throws IOException, WebApplicationException {
+                int recordsPerRoundTrip = 100;                      // Number of records for every round trip to the database
+                int recordPosition = 0;                             // Initial record position index
+                int recordSize = queryCompraRecordsSize();   // Total records found for the query
+
+                // Start streaming the data
+                try ( PrintWriter writer = new PrintWriter( new BufferedWriter( new OutputStreamWriter( os ) ) ) ) {
+
+                    writer.print( "{\"result\": [" );
+
+                    while ( recordSize > 0 ) {
+                        // Get the paged data set from the DB
+                        List<Compra> compras = listAllCompraEntities( recordPosition, recordsPerRoundTrip );
+
+                        for ( Compra compra : compras ) {
+                            if ( recordPosition > 0 ) {
+                                writer.print( "," );
+                            }
+
+                            // Stream the data in Json object format
+                            writer.print( Json.createObjectBuilder()
+                                    .add( "id", compra.getId() )
+                                    .add( "fecha", compra.getFecha() )
+                                    .add(" proveedor", compra.getProveedor().getId())
+                                    .build().toString() );
+
+                            // Increase the recordPosition for every record streamed
+                            recordPosition++;
+                        }
+
+                        // update the recordSize (remaining no. of records)
+                        recordSize -= recordsPerRoundTrip;
+                    }
+
+                    // Done!
+                    writer.print( "]}" );
+                }
+            }
+        } ).build();
     }
 }

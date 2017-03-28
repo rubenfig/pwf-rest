@@ -101,6 +101,13 @@
            <version>2.0.1</version>
        </dependency>
 
+       <!-- https://mvnrepository.com/artifact/javax.json/javax.json-api -->
+       <dependency>
+           <groupId>javax.json</groupId>
+           <artifactId>javax.json-api</artifactId>
+           <version>1.0</version>
+       </dependency>
+
        <!-- JSR-303 (Bean Validation) Implementation -->
        <!-- Provides portable constraints such as @Email -->
        <!-- Hibernate Validator is shipped in JBoss AS 7 -->
@@ -135,6 +142,14 @@
                <failOnMissingWebXml>false</failOnMissingWebXml>
             </configuration>
          </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                  <source>1.7</source>
+                  <target>1.7</target>
+              </configuration>
+          </plugin>
       </plugins>
    </build>
 

@@ -1,5 +1,6 @@
 package py.pol.una.ii.pw.service;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.sun.media.sound.DLSModulator;
 import py.pol.una.ii.pw.model.Compra;
@@ -16,11 +17,11 @@ import javax.transaction.UserTransaction;
 
 import com.google.gson.Gson;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
+import javax.json.Json;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
 @Stateless
@@ -93,4 +94,57 @@ public class CompraMasivaRegistration {
         }
 
     }
+
+    /*private int queryCompraRecordsSize() {
+        return em.createNamedQuery( "Compra.queryRecordsSize", Long.class )
+                .getSingleResult().intValue();
+    }
+
+    private List<Compra> listAllCompraEntities(int recordPosition, int recordsPerRoundTrip ) {
+        return em.createNamedQuery( "Compra.listAll" )
+                .setFirstResult( recordPosition )
+                .setMaxResults( recordsPerRoundTrip )
+                .getResultList();
+    }*/
+
+    /*public void write( OutputStream os ) throws IOException {
+        int recordsPerRoundTrip = 100;                      // Number of records for every round trip to the database
+        int recordPosition = 0;                             // Initial record position index
+        int recordSize = queryCompraRecordsSize();   // Total records found for the query
+
+        // Start streaming the data
+        try ( PrintWriter writer = new PrintWriter( new BufferedWriter( new OutputStreamWriter( os ) ) ) ) {
+
+            writer.print( "{\"result\": [" );
+
+            while ( recordSize > 0 ) {
+                // Get the paged data set from the DB
+                List<Compra> compras = listAllCompraEntities( recordPosition, recordsPerRoundTrip );
+
+                for ( Compra compra : compras ) {
+                    if ( recordPosition > 0 ) {
+                        writer.print( "," );
+                    }
+
+                    // Stream the data in Json object format
+                    writer.print( Json.createObjectBuilder()
+                            .add( "id", compra.getId() )
+                            .add( "fecha", compra.getFecha() )
+                            .add( "proveedor", compra.getProveedor().toString() )
+                            .add( "productos", compra.getProductos().toString() )
+                            .build().toString() );
+
+                    // Increase the recordPosition for every record streamed
+                    recordPosition++;
+                }
+
+                // update the recordSize (remaining no. of records)
+                recordSize -= recordsPerRoundTrip;
+            }
+
+            // Done!
+            writer.print( "]}" );
+        }
+    }*/
+
 }
