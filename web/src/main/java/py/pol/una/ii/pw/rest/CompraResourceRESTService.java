@@ -165,7 +165,7 @@ public class CompraResourceRESTService {
      * Nuevo metodo para descargar archivos enviados desde el cliente
      */
 
-    private final String UPLOADED_FILE_PATH = "/home/carlitos/Documentos/";
+    private final String UPLOADED_FILE_PATH = System.getProperty("user.home")+"/";
 
     @POST
     @Path("/masivas")
@@ -174,7 +174,6 @@ public class CompraResourceRESTService {
 
         Response.ResponseBuilder builder = null;
         String fileName = "";
-
         Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
         List<InputPart> inputParts = uploadForm.get("uploadedFile");
 
@@ -185,34 +184,42 @@ public class CompraResourceRESTService {
                 MultivaluedMap<String, String> header = inputPart.getHeaders();
                 fileName = getFileName(header);
 
-                //convert the uploaded file to inputstream
+                //cConvierte el archivo a inputstream
                 InputStream inputStream = inputPart.getBody(InputStream.class,null);
 
                 byte [] bytes = org.apache.commons.io.IOUtils.toByteArray(inputStream);
 
-                //constructs upload file path
+                //construye el path
                 fileName = UPLOADED_FILE_PATH + fileName;
 
                 writeFile(bytes,fileName);
+                String m =registrationMasivo.registerComprasMasivas(fileName);
+                if (!m.equals(""))
+                {
+                    builder = Response.status(Response.Status.BAD_REQUEST).entity(m);
+                }else{
 
-                registrationMasivo.registerComprasMasivas(fileName);
-
-
-
-                // Create an "ok" response
-                builder = Response.ok();
-
-            } catch (IOException e) {
+                    // Create an "ok" response
+                    builder = Response.ok();
+                    builder.entity("El nombre del archivo descargado es:" + fileName).build();
+                }
+            } catch (ConstraintViolationException ce) {
+                // Handle bean validation issues
+                builder = createViolationResponse(ce.getConstraintViolations());
+            } catch (Exception e) {
                 e.printStackTrace();
+                Map<String, String> responseObj = new HashMap<String, String>();
+                responseObj.put("error", e.getMessage());
+                builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+
             } finally {
                 deleteFile(fileName);
             }
 
         }
-
-        return Response.status(200)
-                .entity("El nombre del archivo descargado es:" + fileName).build();
-
+        if (builder==null)
+            builder = Response.status(Response.Status.BAD_REQUEST).entity("Ocurrió un error");
+        return builder.build();
     }
 
     /**
@@ -222,7 +229,6 @@ public class CompraResourceRESTService {
      * 	Content-Disposition=[form-data; name="file"; filename="filename.extension"]
      * }
      **/
-    //get uploaded filename, is there a easy way in RESTEasy?
     private String getFileName(MultivaluedMap<String, String> header) {
 
         String[] contentDisposition = header.getFirst("Content-Disposition").split(";");
@@ -236,10 +242,9 @@ public class CompraResourceRESTService {
                 return finalFileName;
             }
         }
-        return "unknown";
+        return "desconocido";
     }
 
-    //save to somewhere
     private void writeFile(byte[] content, String filename) throws IOException {
 
         File file = new File(filename);
@@ -256,7 +261,6 @@ public class CompraResourceRESTService {
 
     }
 
-    //eliminar archivo que se utilizo para las compras masivas
     private void deleteFile(String path){
         try{
             File file = new File(path);
@@ -522,27 +526,8 @@ public class CompraResourceRESTService {
         return compra;
     }
 
-    @Inject
-    private EntityManager entityManager;
-
-    protected EntityManager getEntityManager() {
-        return entityManager;
-    }
-
-    private int queryCompraRecordsSize() {
-        return getEntityManager().createNamedQuery( "Compra.queryRecordsSize", Long.class )
-                .getSingleResult().intValue();
-    }
-
-    private List<Compra> listAllCompraEntities(int recordPosition, int recordsPerRoundTrip ) {
-        return getEntityManager().createNamedQuery( "Compra.listAll" )
-                .setFirstResult( recordPosition )
-                .setMaxResults( recordsPerRoundTrip )
-                .getResultList();
-    }
-
     /**
-     * Say "NO" to response caching
+     * Evitar el cacheo de respuesta
      */
     protected Response.ResponseBuilder getNoCacheResponseBuilder( Response.Status status ) {
         CacheControl cc = new CacheControl();
@@ -554,9 +539,8 @@ public class CompraResourceRESTService {
     }
 
     @GET
-    @Path( "/list-all" )
+    @Path( "/list" )
     @Produces( "application/json" )
-    //@TransactionAttribute( TransactionAttributeType.NEVER )
     public Response streamGenerateCompras() {
 
         return getNoCacheResponseBuilder( Response.Status.OK ).entity( new StreamingOutput() {
@@ -566,35 +550,35 @@ public class CompraResourceRESTService {
             public void write( OutputStream os ) throws IOException, WebApplicationException {
                 int recordsPerRoundTrip = 100;                      // Number of records for every round trip to the database
                 int recordPosition = 0;                             // Initial record position index
-                int recordSize = queryCompraRecordsSize();   // Total records found for the query
+                int recordSize = registrationMasivo.queryCompraRecordsSize();   // Total records found for the query
 
-                // Start streaming the data
+                // Empezar el streaming de datos
                 try ( PrintWriter writer = new PrintWriter( new BufferedWriter( new OutputStreamWriter( os ) ) ) ) {
 
                     writer.print( "{\"result\": [" );
 
                     while ( recordSize > 0 ) {
-                        // Get the paged data set from the DB
-                        List<Compra> compras = listAllCompraEntities( recordPosition, recordsPerRoundTrip );
+                        // Conseguir los datos paginados de la BD
+                        List<Compra> compras = registrationMasivo.listAllCompraEntities( recordPosition, recordsPerRoundTrip );
                         Gson gs = new Gson();
                         for ( Compra compra : compras ) {
                             if ( recordPosition > 0 ) {
                                 writer.print( "," );
                             }
 
-                            // Stream the data in Json object format
+                            // Stream de los datos en json
 
                             writer.print(gs.toJson(compra));
 
-                            // Increase the recordPosition for every record streamed
+                            // Aumentar la posicion de la pagina
                             recordPosition++;
                         }
 
-                        // update the recordSize (remaining no. of records)
+                        // Actualizar el numero de datos restantes
                         recordSize -= recordsPerRoundTrip;
                     }
 
-                    // Done!
+                    // Se termina el json
                     writer.print( "]}" );
                 }
             }
