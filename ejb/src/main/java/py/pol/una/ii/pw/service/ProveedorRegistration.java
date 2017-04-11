@@ -1,12 +1,14 @@
 package py.pol.una.ii.pw.service;
 
+import org.apache.ibatis.session.SqlSession;
+import py.pol.una.ii.pw.mappers.ProveedorMapper;
 import py.pol.una.ii.pw.model.Proveedor;
+import py.pol.una.ii.pw.util.Factory;
 
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-
 import java.util.logging.Logger;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
@@ -24,20 +26,36 @@ public class ProveedorRegistration {
 
     public void register(Proveedor proveedor) throws Exception {
         log.info("Registrando " + proveedor.getNombre());
-        em.persist(proveedor);
-        proveedorEventSrc.fire(proveedor);
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            ProveedorMapper Mapper = sqlSession.getMapper(ProveedorMapper.class);
+            Mapper.register(proveedor);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
     
     public void update(Proveedor proveedor) throws Exception {
     	log.info("Actualizando Proveedor, el nuevo nombre es: " + proveedor.getNombre());
-    	em.merge(proveedor);
-    	em.flush();
-    	proveedorEventSrc.fire(proveedor);
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            ProveedorMapper Mapper = sqlSession.getMapper(ProveedorMapper.class);
+            Mapper.update(proveedor);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
     
-    public void remove(Proveedor proveedor) throws Exception {
-    	proveedor = em.merge(proveedor);
-    	em.remove(proveedor);
-    	em.flush();
+    public void remove(long id) throws Exception {
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            ProveedorMapper Mapper = sqlSession.getMapper(ProveedorMapper.class);
+            Mapper.delete(id);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 }

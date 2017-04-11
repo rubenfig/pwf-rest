@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="py.pol.una.ii.pw.mappers.ProveedorMapper">
+
+    <select id="findAllOrderedByName" parameterType="map" flushCache="true"
+            resultType="py.pol.una.ii.pw.model.Proveedor">
+        SELECT
+        id AS id,
+        nombre AS nombre,
+        telefono AS telefono,
+        email AS email
+        FROM Proveedor
+        <where>
+                <if test="nombre != null">
+                    AND nombre LIKE '%' || #{nombre} || '%'
+                </if>
+
+                <if test="email != null">
+                    AND email LIKE '%' || #{email} || '%'
+                </if>
+                <if test="telefono != null">
+                    AND telefono = '%' || #{telefono} || '%'
+                </if>
+
+        </where>
+    </select>
+
+    <select id="findById" parameterType="long" resultType="py.pol.una.ii.pw.model.Proveedor">
+        SELECT id AS id,
+        nombre AS nombre,
+        telefono AS telefono,
+        email AS email
+        FROM proveedor WHERE id = #{id}
+    </select>
+
+    <insert id="register" parameterType="py.pol.una.ii.pw.model.Proveedor" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="id">
+        INSERT INTO proveedor (nombre, email, telefono)
+        VALUES (#{nombre},
+                #{email},
+                #{telefono})
+    </insert>
+
+    <update id="update" parameterType="py.pol.una.ii.pw.model.Proveedor">
+        UPDATE proveedor
+        SET nombre= #{nombre},
+        email= #{email},
+        telefono = #{telefono}
+        where id = #{id}
+    </update>
+
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM proveedor WHERE id = #{id}
+    </delete>
+</mapper>

@@ -17,5 +17,8 @@
     </environments>
     <mappers>
         <mapper resource='mappers/ClienteMapper.xml'/>
+        <mapper resource='mappers/ProveedorMapper.xml'/>
+
+
     </mappers>
 </configuration>
