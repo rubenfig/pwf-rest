@@ -16,36 +16,21 @@
  */
 package py.pol.una.ii.pw.rest;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
+import py.pol.una.ii.pw.data.ClienteRepository;
+import py.pol.una.ii.pw.model.Cliente;
+import py.pol.una.ii.pw.service.ClienteRegistration;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.persistence.NoResultException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import py.pol.una.ii.pw.data.ClienteRepository;
-import py.pol.una.ii.pw.model.Cliente;
-import py.pol.una.ii.pw.service.ClienteRegistration;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * JAX-RS Example
@@ -144,10 +129,6 @@ public class ClienteResourceRESTService {
             throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(violations));
         }
 
-        // Check the uniqueness of the email address
-        if (emailAlreadyExists(cliente.getEmail(),cliente.getId())) {
-            throw new ValidationException("Unique Email Violation");
-        }
     }
 
     /**
@@ -169,26 +150,7 @@ public class ClienteResourceRESTService {
         return Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
     }
 
-    /**
-     * Checks if a cliente with the same email address is already registered. This is the only way to easily capture the
-     * "@UniqueConstraint(columnNames = "email")" constraint from the Cliente class.
-     * 
-     * @param email The email to check
-     * @return True if the email already exists, and false otherwise
-     */
-    public boolean emailAlreadyExists(String email, Long id) {
-        Cliente cliente = null;
-        try {
-            cliente = repository.findByEmail(email);
-        } catch (NoResultException e) {
-            // ignore
-        }
-        if(cliente !=null){
-	        if (cliente.getId()==id)
-	        	cliente=null;
-        }
-        return cliente != null;
-    }
+
     
     /**
      * Update cliente from the values provided. Performs validation, and will return a JAX-RS response with either 200 ok,
@@ -231,18 +193,12 @@ public class ClienteResourceRESTService {
     @DELETE
     @Path("/{id:[0-9][0-9]*}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Cliente deleteClienteById(@PathParam("id") long id) {
-        Cliente cliente = null;
+    public void deleteClienteById(@PathParam("id") long id) {
     	try {
-        	cliente = repository.findById(id);
-        	registration.remove(cliente);
-            if (cliente == null) {
-                throw new WebApplicationException(Response.Status.NOT_FOUND);
-            }
+        	registration.remove(id);
+
         } catch (Exception e){
         	log.info(e.toString());
-        	cliente = null;
         }
-        return cliente;
     }
 }

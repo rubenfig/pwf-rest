@@ -16,61 +16,45 @@
  */
 package py.pol.una.ii.pw.data;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import org.apache.ibatis.session.SqlSession;
+import py.pol.una.ii.pw.mappers.ClienteMapper;
 import py.pol.una.ii.pw.model.Cliente;
+import py.pol.una.ii.pw.util.Factory;
 
-@ApplicationScoped
+import javax.ejb.Stateless;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Stateless
 public class ClienteRepository {
 
-    @Inject
-    private EntityManager em;
-
     public Cliente findById(Long id) {
-        return em.find(Cliente.class, id);
-    }
-
-    public Cliente findByEmail(String email) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Cliente> criteria = cb.createQuery(Cliente.class);
-        Root<Cliente> cliente = criteria.from(Cliente.class);
-        // Swap criteria statements if you would like to try out type-safe criteria queries, a new
-        // feature in JPA 2.0
-        // criteria.select(cliente).where(cb.equal(cliente.get(Cliente_.email), email));
-        criteria.select(cliente).where(cb.equal(cliente.get("email"), email));
-        return em.createQuery(criteria).getSingleResult();
-    }
-
-    public List<Cliente> findAllOrderedByName(String name, String email, String phoneNumber) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Cliente> criteria = cb.createQuery(Cliente.class);
-        Root<Cliente> cliente = criteria.from(Cliente.class);
-        // Swap criteria statements if you would like to try out type-safe criteria queries, a new
-        // feature in JPA 2.0
-        // criteria.select(cliente).orderBy(cb.asc(cliente.get(Cliente_.name)));
-        criteria.select(cliente).orderBy(cb.asc(cliente.get("name")));
-        if (email != null){
-        	List<Cliente> lista=new ArrayList <Cliente>();
-        	lista.add(findByEmail(email));
-        	return lista;
-        }else{
-        	if (name !=null){
-            	criteria.select(cliente).where(cb.equal(cliente.get("name"), name));
-            }
-        	if (phoneNumber !=null){
-            	criteria.select(cliente).where(cb.equal(cliente.get("phoneNumber"), phoneNumber));
-            }
-        	return em.createQuery(criteria).getResultList();
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try
+        {
+            ClienteMapper Mapper = sqlSession.getMapper(ClienteMapper.class);
+            return Mapper.findById(id);
+        } finally
+        {
+            sqlSession.close();
         }
-        
-        
+    }
+
+
+    public List<Cliente> findAllOrderedByName(String name,String  email,String  phoneNumber) {
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try
+        {
+            Map<String, Object> param = new HashMap<String, Object>();
+            param.put("name", name);
+            param.put("phoneNumber", phoneNumber);
+            param.put("email", email);
+            ClienteMapper Mapper = sqlSession.getMapper(ClienteMapper.class);
+            return Mapper.findAllOrderedByName(param);
+        } finally
+        {
+            sqlSession.close();
+        }
     }
 }

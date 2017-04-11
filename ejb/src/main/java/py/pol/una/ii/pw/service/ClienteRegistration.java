@@ -1,6 +1,9 @@
 package py.pol.una.ii.pw.service;
 
+import org.apache.ibatis.session.SqlSession;
+import py.pol.una.ii.pw.mappers.ClienteMapper;
 import py.pol.una.ii.pw.model.Cliente;
+import py.pol.una.ii.pw.util.Factory;
 
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
@@ -22,21 +25,37 @@ public class ClienteRegistration {
     private Event<Cliente> clienteEventSrc;
 
     public void register(Cliente cliente) throws Exception {
-        log.info("Registrando " + cliente.getName());
-        em.persist(cliente);
-        clienteEventSrc.fire(cliente);
+        log.info("Registrando Cliente, el nuevo nombre es: " + cliente.getName());
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            ClienteMapper Mapper = sqlSession.getMapper(ClienteMapper.class);
+            Mapper.register(cliente);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
     
     public void update(Cliente cliente) throws Exception {
     	log.info("Actualizando Cliente, el nuevo nombre es: " + cliente.getName());
-    	em.merge(cliente);
-    	em.flush();
-    	clienteEventSrc.fire(cliente);
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            ClienteMapper Mapper = sqlSession.getMapper(ClienteMapper.class);
+            Mapper.update(cliente);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
     
-    public void remove(Cliente cliente) throws Exception {
-    	cliente = em.merge(cliente);
-    	em.remove(cliente);
-    	em.flush();
+    public void remove(Long id) throws Exception {
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            ClienteMapper Mapper = sqlSession.getMapper(ClienteMapper.class);
+            Mapper.delete(id);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 }
