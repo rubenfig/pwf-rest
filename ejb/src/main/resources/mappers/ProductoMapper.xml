@@ -77,7 +77,7 @@
         INSERT INTO producto (nombre, descripcion, precio, id_proveedor)
         VALUES (#{nombre},
         #{descripcion},
-        #{precio}, #{id_proveedor})
+        #{precio}, #{proveedor.id})
     </insert>
 
     <update id="update" parameterType="py.pol.una.ii.pw.model.Producto">
@@ -85,7 +85,7 @@
         SET nombre= #{nombre},
         descripcion= #{descripcion},
         precio = #{precio},
-        id_proveedor = #{id_proveedor}
+        id_proveedor = #{proveedor.id}
         WHERE id = #{id}
     </update>
 

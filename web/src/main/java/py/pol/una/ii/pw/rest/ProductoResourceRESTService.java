@@ -28,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import py.pol.una.ii.pw.data.ProductoRepository;
+import py.pol.una.ii.pw.data.ProveedorRepository;
 import py.pol.una.ii.pw.model.Producto;
 import py.pol.una.ii.pw.service.ProductoRegistration;
 
@@ -47,6 +48,9 @@ public class ProductoResourceRESTService {
 
     @Inject
     private ProductoRepository repository;
+
+    @Inject
+    private ProveedorRepository proveedorRepository;
 
     @Inject
     ProductoRegistration registration;
@@ -82,6 +86,7 @@ public class ProductoResourceRESTService {
 
         try {
             // Validates producto using bean validation
+            producto.setProveedor(proveedorRepository.findById(producto.getProveedor().getId()));
             validateProducto(producto);
 
             registration.register(producto);
