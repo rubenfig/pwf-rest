@@ -33,8 +33,8 @@ public class ProductoListProducer {
     }
 
     @PostConstruct
-    public void retrieveAllProductosOrderedByName(String nombre, String descripcion, Float telefono) {
-        productos = productoRepository.findAllOrderedByName(nombre, descripcion, telefono);
+    public void retrieveAllProductosOrderedByName(String nombre, String descripcion, Float precio) {
+        productos = productoRepository.findAllOrderedByName(nombre, descripcion, precio);
     }
 }
 

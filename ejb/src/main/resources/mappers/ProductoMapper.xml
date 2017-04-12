@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="py.pol.una.ii.pw.mappers.ProductoMapper">
+
+    <select id="findAllOrderedByName" parameterType="map" flushCache="true"
+            resultMap="productoResult">
+        SELECT
+        producto.id AS id,
+        producto.nombre AS nombre,
+        producto.descripcion AS descripcion,
+        producto.precio AS precio,
+        proveedor.id AS id_proveedor,
+        proveedor.email AS email_proveedor,
+        proveedor.nombre AS nombre_proveedor,
+        proveedor.telefono AS telefono_proveedor
+        FROM producto LEFT OUTER JOIN proveedor on producto.id_proveedor = proveedor.id
+        <where>
+            <if test="nombre != null">
+                AND nombre LIKE '%' || #{nombre} || '%'
+            </if>
+
+            <if test="descripcion != null">
+                AND descripcion LIKE '%' || #{descripcion} || '%'
+            </if>
+
+            <if test="precio != null">
+                AND precio LIKE '%' || #{precio} || '%'
+            </if>
+
+            <if test="id_proveedor != null">
+                AND precio LIKE '%' || #{id_proveedor} || '%'
+            </if>
+        </where>
+    </select>
+
+    <select id="findById" parameterType="long" resultMap="productoResult">
+        SELECT
+        producto.id AS id,
+        producto.nombre AS nombre,
+        producto.descripcion AS descripcion,
+        producto.precio AS precio,
+        proveedor.id AS id_proveedor,
+        proveedor.email AS email_proveedor,
+        proveedor.nombre AS nombre_proveedor,
+        proveedor.telefono AS telefono_proveedor
+        FROM producto LEFT OUTER JOIN proveedor on producto.id_proveedor = proveedor.id
+        WHERE producto.id = #{id}
+    </select>
+
+    <resultMap id="productoResult" type="py.pol.una.ii.pw.model.Producto">
+        <id property="id" column="id" />
+        <result property="nombre" column="nombre"/>
+        <result property="descripcion" column="descripcion"/>
+        <result property="precio" column="precio"/>
+        <association property="proveedor" javaType="py.pol.una.ii.pw.model.Proveedor">
+            <id property="id" column="id_proveedor"/>
+            <result property="email" column="email_proveedor"/>
+            <result property="nombre" column="nombre_proveedor"/>
+            <result property="telefono" column="telefono_proveedor"/>
+        </association>
+    </resultMap>
+
+    <select id="findByDescripcion" parameterType="String" resultType="py.pol.una.ii.pw.model.Producto">
+        SELECT
+        id AS id,
+        nombre AS nombre,
+        descripcion AS descripcion,
+        precio AS precio,
+        id_proveedor AS id_proveedor
+        FROM Producto WHERE descripcion = #{descripcion}
+    </select>
+
+    <insert id="register" parameterType="py.pol.una.ii.pw.model.Producto" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="id">
+        INSERT INTO producto (nombre, descripcion, precio, id_proveedor)
+        VALUES (#{nombre},
+        #{descripcion},
+        #{precio}, #{id_proveedor})
+    </insert>
+
+    <update id="update" parameterType="py.pol.una.ii.pw.model.Producto">
+        UPDATE producto
+        SET nombre= #{nombre},
+        descripcion= #{descripcion},
+        precio = #{precio},
+        id_proveedor = #{id_proveedor}
+        WHERE id = #{id}
+    </update>
+
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM producto WHERE id = #{id}
+    </delete>
+</mapper>

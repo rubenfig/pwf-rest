@@ -18,7 +18,6 @@
     <mappers>
         <mapper resource='mappers/ClienteMapper.xml'/>
         <mapper resource='mappers/ProveedorMapper.xml'/>
-
-
+        <mapper resource='mappers/ProductoMapper.xml'/>
     </mappers>
 </configuration>

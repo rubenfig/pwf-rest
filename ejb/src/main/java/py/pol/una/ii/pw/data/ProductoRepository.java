@@ -1,15 +1,16 @@
 package py.pol.una.ii.pw.data;
 
+import org.apache.ibatis.session.SqlSession;
+import py.pol.una.ii.pw.mappers.ProductoMapper;
+import py.pol.una.ii.pw.model.Producto;
+import py.pol.una.ii.pw.util.Factory;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
+import java.util.HashMap;
 import java.util.List;
-
-import py.pol.una.ii.pw.model.Producto;
+import java.util.Map;
 
 
 @ApplicationScoped
@@ -19,31 +20,36 @@ public class ProductoRepository {
     private EntityManager em;
 
     public Producto findById(Long id) {
-        return em.find(Producto.class, id);
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            ProductoMapper Mapper = sqlSession.getMapper(ProductoMapper.class);
+            return Mapper.findById(id);
+        } finally {
+            sqlSession.close();
+        }
     }
 
     public List<Producto> findAllOrderedByName(String nombre, String descripcion, Float precio) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Producto> criteria = cb.createQuery(Producto.class);
-        Root<Producto> producto = criteria.from(Producto.class);
-        criteria.select(producto).orderBy(cb.asc(producto.get("nombre")));
-        if (nombre !=null){
-        	criteria.select(producto).where(cb.equal(producto.get("nombre"), nombre));
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            Map<String, Object> param = new HashMap<String, Object>();
+            param.put("nombre", nombre);
+            param.put("descripcion", descripcion);
+            param.put("precio", precio);
+            ProductoMapper Mapper = sqlSession.getMapper(ProductoMapper.class);
+            return Mapper.findAllOrderedByName(param);
+        } finally {
+            sqlSession.close();
         }
-        if (descripcion !=null){
-        	criteria.select(producto).where(cb.equal(producto.get("descripcion"), descripcion));
-        }
-        if (precio !=null){
-        	criteria.select(producto).where(cb.equal(producto.get("precio"), precio));
-        }
-        return em.createQuery(criteria).getResultList();
     }
     
     public Producto findByDescripcion(String descripcion) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Producto> criteria = cb.createQuery(Producto.class);
-        Root<Producto> producto = criteria.from(Producto.class);
-        criteria.select(producto).where(cb.equal(producto.get("descripcion"), descripcion));
-        return em.createQuery(criteria).getSingleResult();
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try{
+            ProductoMapper Mapper = sqlSession.getMapper(ProductoMapper.class);
+            return Mapper.findByDescripcion(descripcion);
+        } finally {
+            sqlSession.close();
+        }
     }
 }

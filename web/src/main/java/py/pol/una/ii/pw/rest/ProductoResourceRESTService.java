@@ -161,7 +161,7 @@ public class ProductoResourceRESTService {
      * Checks if a producto with the same email address is already registered. This is the only way to easily capture the
      * "@UniqueConstraint(columnNames = "email")" constraint from the Producto class.
      * 
-     * @param email The email to check
+     * @param descripcion The email to check
      * @return True if the email already exists, and false otherwise
      */
     public boolean descripcionAlreadyExists(String descripcion) {
@@ -218,8 +218,7 @@ public class ProductoResourceRESTService {
     public Producto deleteProductoById(@PathParam("id") long id) {
         Producto producto = null;
     	try {
-        	producto = repository.findById(id);
-        	registration.remove(producto);
+        	registration.remove(id);
             if (producto == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
