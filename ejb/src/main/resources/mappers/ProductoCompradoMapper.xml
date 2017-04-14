@@ -53,4 +53,16 @@
         </association>
     </resultMap>
 
+    <insert id="register" parameterType="py.pol.una.ii.pw.model.ProductoComprado" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="id">
+        INSERT INTO productocomprado (cantidad, producto)
+        VALUES (#{cantidad}, #{producto.id})
+    </insert>
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM productocomprado WHERE id = #{id}
+    </delete>
+
+
+
 </mapper>

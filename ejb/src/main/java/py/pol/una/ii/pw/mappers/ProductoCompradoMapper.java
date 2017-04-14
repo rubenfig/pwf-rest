@@ -10,5 +10,10 @@ import java.util.Map;
  */
 public interface ProductoCompradoMapper {
     List<ProductoComprado> findAllOrderedByName();
+
     ProductoComprado findById(long id_pc);
+
+    void register(ProductoComprado productocomprado);
+
+    void delete(long id);
 }
