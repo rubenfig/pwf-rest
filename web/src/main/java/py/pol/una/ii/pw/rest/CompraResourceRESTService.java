@@ -16,32 +16,6 @@
  */
 package py.pol.una.ii.pw.rest;
 
-import java.io.*;
-import java.util.*;
-import java.util.logging.Logger;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.json.Json;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.persistence.EntityManager;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.*;
-
 import com.google.gson.Gson;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -54,6 +28,22 @@ import py.pol.una.ii.pw.model.Producto;
 import py.pol.una.ii.pw.model.ProductoComprado;
 import py.pol.una.ii.pw.service.CompraMasivaRegistration;
 import py.pol.una.ii.pw.service.CompraRegistration;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.io.*;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * JAX-RS Example
@@ -93,7 +83,7 @@ public class CompraResourceRESTService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Compra> listAllCompras() {
-        return repository.findAllOrderedByName();
+        return repository.findAllOrderedByName(null);
     }
 
     @GET

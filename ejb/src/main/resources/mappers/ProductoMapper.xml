@@ -30,7 +30,7 @@
             </if>
 
             <if test="id_proveedor != null">
-                AND precio LIKE '%' || #{id_proveedor} || '%'
+                AND producto.id_proveedor = '%' || #{id_proveedor} || '%'
             </if>
         </where>
     </select>
