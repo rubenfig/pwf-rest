@@ -1,7 +1,13 @@
 package py.pol.una.ii.pw.service;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import org.apache.ibatis.session.SqlSession;
+import py.pol.una.ii.pw.mappers.CompraMapper;
+import py.pol.una.ii.pw.mappers.CompraMasivaMapper;
+import py.pol.una.ii.pw.mappers.ProductoCompradoMapper;
 import py.pol.una.ii.pw.model.Compra;
+import py.pol.una.ii.pw.util.Factory;
 
 import javax.annotation.Resource;
 import javax.ejb.EJBContext;
@@ -12,12 +18,11 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.UserTransaction;
-
-import com.google.gson.Gson;
-
-import java.io.*;
-import java.util.List;
-import java.util.Scanner;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.logging.Logger;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
@@ -39,10 +44,32 @@ public class CompraMasivaRegistration {
 
     private UserTransaction tx;
 
-    public void register(Compra CompraMasiva) throws Exception {
-        log.info("Se va a registrar la nueva compra");
-        em.persist(CompraMasiva);
-        CompraMasivaEventSrc.fire(CompraMasiva);
+    private SqlSession sqlSession;
+
+    private CompraMapper Mapper;
+
+    private ProductoCompradoMapper mapperProducto;
+
+    public void register(Compra compra) throws Exception {
+        //Se ingresa la fecha en un formato lindo
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+        Date today = Calendar.getInstance().getTime();
+        String reportDate = df.format(today);
+        compra.setFecha(reportDate);
+
+        log.info("Registrando compra de:" + compra.getProveedor());
+        Mapper = sqlSession.getMapper(CompraMapper.class);
+        mapperProducto = sqlSession.getMapper(ProductoCompradoMapper.class);
+        Mapper.register(compra);
+        int n=compra.getProductos().size();
+        for(int i=0;i<n;i++){
+            mapperProducto.register(compra.getProductos().get(i));
+            Map<String, Object> param = new HashMap<String, Object>();
+            param.put("id_compra", compra.getId());
+            param.put("id_productocomprado", compra.getProductos().get(i).getId());
+            Mapper.addProducto(param);
+            compra.getProductos().add(compra.getProductos().get(i));
+        }
     }
 
     public String registerComprasMasivas(String path) throws IOException {
@@ -51,15 +78,14 @@ public class CompraMasivaRegistration {
         try {
             inputStream = new FileInputStream(path);
             sc = new Scanner(inputStream, "UTF-8");
-            tx = context.getUserTransaction();
-            tx.begin();
+            sqlSession = Factory.getSqlSessionFactory().openSession();
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
                 Gson gs = new Gson();
                 Compra Compra = gs.fromJson(line, Compra.class);
                 register(Compra);
             }
-            tx.commit();
+            sqlSession.commit();
             log.info("La compra masiva se realizó con exito");
             // note that Scanner suppresses exceptions
             if (sc.ioException() != null) {
@@ -85,17 +111,22 @@ public class CompraMasivaRegistration {
     }
 
     public void cancelarCompras(){
-        try{
-            tx.rollback();
-        }catch (Exception e){
-            e.printStackTrace();
+        try {
+            sqlSession.rollback();
+        } finally {
+            sqlSession.close();
         }
 
     }
 
     public int queryCompraRecordsSize() {
-        return em.createNamedQuery( "Compra.queryRecordsSize", Long.class )
-                .getSingleResult().intValue();
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            CompraMasivaMapper mapper = sqlSession.getMapper(CompraMasivaMapper.class);
+            return mapper.compraRecordSize();
+        } finally {
+            sqlSession.close();
+        }
     }
 
     public List<Compra> listAllCompraEntities(int recordPosition, int recordsPerRoundTrip ) {
