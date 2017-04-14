@@ -130,10 +130,16 @@ public class CompraMasivaRegistration {
     }
 
     public List<Compra> listAllCompraEntities(int recordPosition, int recordsPerRoundTrip ) {
-        return em.createNamedQuery( "Compra.listAll" )
-                .setFirstResult( recordPosition )
-                .setMaxResults( recordsPerRoundTrip )
-                .getResultList();
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            Map<String, Object> param = new HashMap<String, Object>();
+            param.put("limit", recordsPerRoundTrip);
+            param.put("offset", recordPosition);
+            CompraMasivaMapper Mapper = sqlSession.getMapper(CompraMasivaMapper.class);
+            return Mapper.listAll(param);
+        } finally {
+            sqlSession.close();
+        }
     }
 
 }

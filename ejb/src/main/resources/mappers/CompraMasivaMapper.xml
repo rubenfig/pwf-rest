@@ -4,8 +4,77 @@
 
 <mapper namespace="py.pol.una.ii.pw.mappers.CompraMasivaMapper">
     <select id="compraRecordSize" resultType="int">
-        SELECT count(u) FROM Compra u
+        select count(u) from (select compra.id as id_compra, compra.fecha as fecha_compra,
+	productocomprado.cantidad as cantidad_producto,
+	productocomprado.producto as id_producto,
+	producto.descripcion as descripcion_producto,
+	producto.nombre as nombre_producto,
+	producto.precio as precio_producto,
+	producto.id_proveedor as proveedor_producto,
+	compra.id_proveedor as proveedor_compra,
+	proveedor.email as email_proveedor, proveedor.nombre as nombre_proveedor,
+	proveedor.telefono as tel_proveedor
+	from compra
+	left outer join compras_productos on compra.id = compras_productos.id_compra
+	left outer join productocomprado on compras_productos.id_productocomprado = productocomprado.id
+	left outer join producto on productocomprado.producto = producto.id
+	left outer join proveedor on compra.id_proveedor = proveedor.id) u
     </select>
 
+    <sql id="recursoColumns">
+        SELECT
+        compra.id AS id,
+        compra.fecha AS fecha,
+        proveedor.id AS id_proveedor,
+        proveedor.email AS email_proveedor,
+        proveedor.nombre AS nombre_proveedor,
+        proveedor.telefono AS telefono_proveedor,
+        productocomprado.id as id_pc,
+        productocomprado.cantidad as cantidad,
+        productocomprado.producto as id_producto,
+        producto.descripcion as descripcion_producto,
+        producto.nombre as nombre_producto,
+        producto.precio as precio_producto,
+        producto.id_proveedor as proveedor_producto
+        FROM compra LEFT OUTER JOIN proveedor on compra.id_proveedor = proveedor.id
+        left outer join compras_productos on compras_productos.id_compra = compra.id
+        left outer join productocomprado on productocomprado.id = compras_productos.id_productocomprado
+        left outer join producto on productocomprado.producto = producto.id
+    </sql>
+
+    <select id="listAll" parameterType="map" flushCache="true"
+            resultMap="compraResult">
+        <include refid="recursoColumns" />
+        limit #{limit} offset #{offset}
+    </select>
+
+    <resultMap id="compraResult" type="py.pol.una.ii.pw.model.Compra">
+        <id property="id" column="id" />
+        <result property="fecha" column="fecha"/>
+        <association property="proveedor" javaType="py.pol.una.ii.pw.model.Proveedor">
+            <id property="id" column="id_proveedor"/>
+            <result property="email" column="email_proveedor"/>
+            <result property="nombre" column="nombre_proveedor"/>
+            <result property="telefono" column="telefono_proveedor"/>
+        </association>
+        <collection javaType="ArrayList" property="productos" resultMap="ProductoCompradoResult" />
+    </resultMap>
+
+    <resultMap id="ProductoCompradoResult" type="py.pol.una.ii.pw.model.ProductoComprado">
+        <id property="id" column="id_pc" />
+        <result property="cantidad" column="cantidad"/>
+        <association property="producto" javaType="py.pol.una.ii.pw.model.Producto">
+            <id property="id" column="id_producto"/>
+            <result property="nombre" column="nombre_producto"/>
+            <result property="descripcion" column="descripcion_producto"/>
+            <result property="precio" column="precio_producto"/>
+            <association property="proveedor" javaType="py.pol.una.ii.pw.model.Proveedor">
+                <id property="id" column="proveedor_producto"/>
+                <result property="email" column="email_proveedor"/>
+                <result property="nombre" column="nombre_proveedor"/>
+                <result property="telefono" column="telefono_proveedor"/>
+            </association>
+        </association>
+    </resultMap>
 
 </mapper>
