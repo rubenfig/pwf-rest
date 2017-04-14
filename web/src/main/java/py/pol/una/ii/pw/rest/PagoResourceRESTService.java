@@ -16,11 +16,9 @@
  */
 package py.pol.una.ii.pw.rest;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.RequestScoped;
@@ -101,7 +99,9 @@ public class PagoResourceRESTService {
         try {
             // Validates pago using bean validation
             validatePago(pago);
-
+            DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+            Date today = Calendar.getInstance().getTime();
+            pago.setFecha(today);
             registration.register(pago);
 
             // Create an "ok" response

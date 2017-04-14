@@ -29,7 +29,11 @@
     </select>
 
     <select id="findById" parameterType="long" resultType="py.pol.una.ii.pw.model.Cliente">
-        SELECT * FROM Cliente WHERE id = #{id}
+        SELECT id AS id,
+        name AS name,
+        phone_number AS phoneNumber,
+        email AS email,
+        cuenta AS cuenta FROM Cliente WHERE id = #{id}
     </select>
 
     <insert id="register" parameterType="py.pol.una.ii.pw.model.Cliente" useGeneratedKeys="true"

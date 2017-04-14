@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="py.pol.una.ii.pw.mappers.PagoMapper">
+
+    <select id="findAllOrderedById" parameterType="map" flushCache="true"
+            resultMap="pagoResult">
+      select
+      p.id as id_pago,
+      p.fecha as fecha_pago,
+      p.monto as monto_pago,
+      p.id_cliente as cliente_pago,
+      c.name as nombre_cliente,
+      c.email as email_cliente,
+      c.cuenta as cuenta_cliente,
+      c.phone_number as telefono_cliente
+      from pago as p
+      left outer join cliente as c on p.id_cliente = c.id
+    </select>
+
+    <select id="findById" parameterType="long" resultMap="pagoResult">
+      select
+      p.id as id_pago,
+      p.fecha as fecha_pago,
+      p.monto as monto_pago,
+      p.id_cliente as cliente_pago,
+      c.name as nombre_cliente,
+      c.email as email_cliente,
+      c.cuenta as cuenta_cliente,
+      c.phone_number as telefono_cliente
+      from pago as p
+      left outer join cliente as c on p.id_cliente = c.id
+      where p.id = #{id}
+    </select>
+
+    <resultMap id="pagoResult" type="py.pol.una.ii.pw.model.Pago">
+        <id property="id" column="id_pago" />
+        <result property="monto" column="monto_pago"/>
+        <result property="fecha" column="fecha_pago"/>
+        <association property="cliente" javaType="py.pol.una.ii.pw.model.Cliente">
+            <id property="id" column="cliente_pago"/>
+            <result property="name" column="nombre_cliente"/>
+            <result property="email" column="email_cliente"/>
+            <result property="cuenta" column="cuenta_cliente"/>
+            <result property="phoneNumber" column="telefono_cliente"/>
+        </association>
+    </resultMap>
+
+    <insert id="register" parameterType="py.pol.una.ii.pw.model.Pago" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="id">
+        INSERT INTO Pago (fecha, monto, id_cliente)
+        VALUES (#{fecha},
+        #{monto},
+        #{cliente.id})
+    </insert>
+
+</mapper>
