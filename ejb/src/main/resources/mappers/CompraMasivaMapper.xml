@@ -36,16 +36,19 @@
         producto.nombre as nombre_producto,
         producto.precio as precio_producto,
         producto.id_proveedor as proveedor_producto
-        FROM compra LEFT OUTER JOIN proveedor on compra.id_proveedor = proveedor.id
+        FROM
+        (select * from compra limit #{limit} offset #{offset}) as
+        compra LEFT OUTER JOIN proveedor on compra.id_proveedor = proveedor.id
         left outer join compras_productos on compras_productos.id_compra = compra.id
         left outer join productocomprado on productocomprado.id = compras_productos.id_productocomprado
         left outer join producto on productocomprado.producto = producto.id
+
     </sql>
 
     <select id="listAll" parameterType="map" flushCache="true"
             resultMap="compraResult">
         <include refid="recursoColumns" />
-        limit #{limit} offset #{offset}
+        order by compra.id
     </select>
 
     <resultMap id="compraResult" type="py.pol.una.ii.pw.model.Compra">
