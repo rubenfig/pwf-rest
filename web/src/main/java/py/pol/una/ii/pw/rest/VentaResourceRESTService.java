@@ -1,12 +1,14 @@
 package py.pol.una.ii.pw.rest;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
+import com.google.gson.Gson;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import py.pol.una.ii.pw.data.VentaRepository;
+import py.pol.una.ii.pw.model.Producto;
+import py.pol.una.ii.pw.model.ProductoComprado;
+import py.pol.una.ii.pw.model.Venta;
+import py.pol.una.ii.pw.service.VentaMasivaRegistration;
+import py.pol.una.ii.pw.service.VentaRegistration;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -18,22 +20,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-
-import com.google.gson.Gson;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import py.pol.una.ii.pw.data.VentaRepository;
-import py.pol.una.ii.pw.model.*;
-import py.pol.una.ii.pw.service.VentaMasivaRegistration;
-import py.pol.una.ii.pw.service.VentaRegistration;
+import java.io.*;
+import java.util.*;
+import java.util.logging.Logger;
 
 @Path("/ventas")
 @RequestScoped
@@ -59,7 +50,7 @@ public class VentaResourceRESTService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Venta> listAllVentas() {
-        return repository.findAllOrderedById();
+        return repository.findAllOrderedById(null);
     }
 
     @GET

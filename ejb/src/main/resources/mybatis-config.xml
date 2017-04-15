@@ -20,6 +20,7 @@
         <mapper resource='mappers/ProductoCompradoMapper.xml'/>
         <mapper resource='mappers/PagoMapper.xml'/>
         <mapper resource='mappers/CompraMapper.xml'/>
+        <mapper resource='mappers/VentaMapper.xml'/>
         <mapper resource='mappers/CompraMasivaMapper.xml'/>
     </mappers>
 </configuration>
