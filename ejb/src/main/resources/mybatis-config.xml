@@ -22,5 +22,6 @@
         <mapper resource='mappers/CompraMapper.xml'/>
         <mapper resource='mappers/VentaMapper.xml'/>
         <mapper resource='mappers/CompraMasivaMapper.xml'/>
+        <mapper resource='mappers/VentaMasivaMapper.xml'/>
     </mappers>
 </configuration>
