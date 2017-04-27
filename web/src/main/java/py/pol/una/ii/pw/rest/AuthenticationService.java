@@ -4,11 +4,20 @@ package py.pol.una.ii.pw.rest;
  * Created by carlitos on 25/04/17.
  */
 
-import java.io.IOException;
 import org.apache.commons.codec.binary.Base64;
+
+import javax.enterprise.context.RequestScoped;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.StringTokenizer;
 
+@Path("/login")
+@RequestScoped
 public class AuthenticationService {
+
+
     public boolean authenticate(String authCredentials) {
 
         if (null == authCredentials)
@@ -37,5 +46,16 @@ public class AuthenticationService {
         boolean authenticationStatus = "admin".equals(username)
                 && "admin".equals(password);
         return authenticationStatus;
+    }
+
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String login (@FormParam("username") String username,
+                         @FormParam("password") String password){
+        if (username.equals("admin") && password.equals("admin") ){
+            return "Basic YWRtaW46YWRtaW4=";}
+        else
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
 }
