@@ -77,6 +77,7 @@ public class CompraMasivaRegistration {
             sqlSession = Factory.getSqlSessionFactory().openSession();
             register(compra);
             sqlSession.commit();
+            sqlSession.close();
         }catch (Exception e) {
             e.printStackTrace();
             log.info("Se produjo un error inesperado");

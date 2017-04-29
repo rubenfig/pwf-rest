@@ -107,6 +107,7 @@ public class VentaMasivaRegistration {
             sqlSession = Factory.getSqlSessionFactory().openSession();
             register(venta);
             sqlSession.commit();
+            sqlSession.close();
             log.info("La venta masiva se realizó con exito");
         }catch (Exception e){
             e.printStackTrace();
