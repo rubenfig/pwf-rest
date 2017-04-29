@@ -104,6 +104,39 @@ public class CompraResourceRESTService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    public Response crearCompra(Compra compra) {
+
+        Response.ResponseBuilder builder = null;
+
+        try {
+            validateCompra(compra);
+            registrationMasivo.registerSingle(compra);
+            builder = Response.ok();
+        } catch (ConstraintViolationException ce) {
+            // Handle bean validation issues
+            builder = createViolationResponse(ce.getConstraintViolations());
+        } catch (ValidationException e) {
+            // Handle the unique constrain violation
+            Map<String, String> responseObj = new HashMap<String, String>();
+            responseObj.put("descripcion", "Descripcion taken");
+            responseObj.put("nombre", "Name taken");
+            builder = Response.status(Response.Status.CONFLICT).entity(responseObj);
+        } catch (Exception e) {
+            // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<String, String>();
+            if ("Transaction rolled back".equals(e.getMessage())) {
+                responseObj.put("error", "No existe el proveedor");
+            }
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+        }
+        return builder.build();
+    }
+
+    @POST
+    @Path("/iniciar")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response createCompra(Compra compra) {
 
         Response.ResponseBuilder builder = null;

@@ -72,6 +72,19 @@ public class CompraMasivaRegistration {
         }
     }
 
+    public void registerSingle(Compra compra) throws Exception {
+        try{
+            sqlSession = Factory.getSqlSessionFactory().openSession();
+            register(compra);
+            sqlSession.commit();
+        }catch (Exception e) {
+            e.printStackTrace();
+            log.info("Se produjo un error inesperado");
+            cancelarCompras();
+        }
+
+    }
+
     public String registerComprasMasivas(String path) throws IOException {
         FileInputStream inputStream = null;
         Scanner sc = null;

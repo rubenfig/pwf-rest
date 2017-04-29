@@ -68,7 +68,34 @@ public class VentaResourceRESTService {
      * Creates a new venta from the values provided. Performs validation, and will return a JAX-RS response with either 200 ok,
      * or with a map of fields, and related errors.
      */
+
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response crearVenta(Venta venta) {
+
+        Response.ResponseBuilder builder = null;
+
+        try {
+            validateVenta(venta);
+            registrationMasivo.registerSingle(venta);
+            // Create an "ok" response
+            builder = Response.ok();
+        } catch (ConstraintViolationException ce) {
+            // Handle bean validation issues
+            builder = createViolationResponse(ce.getConstraintViolations());
+        } catch (Exception e) {
+            // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<String, String>();
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+        }
+
+        return builder.build();
+    }
+
+    @POST
+    @Path("/iniciar")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createVenta(Venta venta) {

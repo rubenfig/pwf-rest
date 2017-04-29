@@ -101,6 +101,21 @@ public class VentaMasivaRegistration {
 
     }
 
+    public void registerSingle(Venta venta) throws Exception {
+
+        try{
+            sqlSession = Factory.getSqlSessionFactory().openSession();
+            register(venta);
+            sqlSession.commit();
+            log.info("La venta masiva se realizó con exito");
+        }catch (Exception e){
+            e.printStackTrace();
+            cancelarVentas();
+            log.info("La venta masiva tuvo un error y no persistió");
+        }
+
+    }
+
     public String registerVentasMasivas(String path) throws IOException {
         FileInputStream inputStream = null;
         Scanner sc = null;
