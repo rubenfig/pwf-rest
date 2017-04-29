@@ -25,7 +25,7 @@
           </elementProp>
           <elementProp name="100F" elementType="Argument">
             <stringProp name="Argument.name">100F</stringProp>
-            <stringProp name="Argument.value">35</stringProp>
+            <stringProp name="Argument.value">100</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -334,7 +334,7 @@ Thread.sleep(5000);</stringProp>
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&quot;fecha&quot;:&quot;12/12/17&quot;, &quot;productos&quot;:[{&quot;producto&quot;: {&quot;id&quot;:${p1}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p2}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p3}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p4}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p5}}, &quot;cantidad&quot;: 15}], &quot;proveedor&quot;: {&quot;id&quot;:2}}</stringProp>
+                <stringProp name="Argument.value">{&quot;fecha&quot;:&quot;12/12/17&quot;, &quot;productos&quot;:[{&quot;producto&quot;: {&quot;id&quot;:${p1}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p2}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p3}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p4}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p5}}, &quot;cantidad&quot;: 15}], &quot;proveedor&quot;: {&quot;id&quot;:5}}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
@@ -937,7 +937,7 @@ Thread.sleep(5000);</stringProp>
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&quot;fecha&quot;:&quot;12/12/17&quot;, &quot;productos&quot;:[{&quot;producto&quot;: {&quot;id&quot;:${p1}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p2}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p3}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p4}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p5}}, &quot;cantidad&quot;: 15}], &quot;cliente&quot;: {&quot;id&quot;:6}}</stringProp>
+                <stringProp name="Argument.value">{&quot;fecha&quot;:&quot;12/12/17&quot;, &quot;productos&quot;:[{&quot;producto&quot;: {&quot;id&quot;:${p1}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p2}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p3}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p4}}, &quot;cantidad&quot;: 15},{&quot;producto&quot;: {&quot;id&quot;:${p5}}, &quot;cantidad&quot;: 15}], &quot;cliente&quot;: {&quot;id&quot;:2}}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
