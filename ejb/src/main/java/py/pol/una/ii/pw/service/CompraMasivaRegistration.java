@@ -7,6 +7,7 @@ import py.pol.una.ii.pw.mappers.CompraMapper;
 import py.pol.una.ii.pw.mappers.CompraMasivaMapper;
 import py.pol.una.ii.pw.mappers.ProductoCompradoMapper;
 import py.pol.una.ii.pw.model.Compra;
+import py.pol.una.ii.pw.util.EjbInterceptor;
 import py.pol.una.ii.pw.util.Factory;
 
 import javax.annotation.Resource;
@@ -16,6 +17,7 @@ import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 import javax.persistence.EntityManager;
 import javax.transaction.UserTransaction;
 import java.io.FileInputStream;
@@ -27,6 +29,7 @@ import java.util.logging.Logger;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
 @Stateless
+@Interceptors(EjbInterceptor.class)
 @TransactionManagement(TransactionManagementType.BEAN)
 public class CompraMasivaRegistration {
 

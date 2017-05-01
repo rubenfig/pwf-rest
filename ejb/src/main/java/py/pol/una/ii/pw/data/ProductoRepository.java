@@ -3,16 +3,18 @@ package py.pol.una.ii.pw.data;
 import org.apache.ibatis.session.SqlSession;
 import py.pol.una.ii.pw.mappers.ProductoMapper;
 import py.pol.una.ii.pw.model.Producto;
+import py.pol.una.ii.pw.util.EjbInterceptor;
 import py.pol.una.ii.pw.util.Factory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 import javax.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+@Interceptors(EjbInterceptor.class)
 @ApplicationScoped
 public class ProductoRepository {
 
