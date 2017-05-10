@@ -1,11 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
-    <filter>
-        <filter-name>RestAuthenticationFilter</filter-name>
-        <filter-class>py.pol.una.ii.pw.rest.RestAuthenticationFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>RestAuthenticationFilter</filter-name>
-        <url-pattern>/rest/*</url-pattern>
-    </filter-mapping>
+
+    <module-name>backend</module-name>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Login</web-resource-name>
+            <url-pattern>/rest/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>PUT</http-method>
+            <http-method>DELETE</http-method>
+            <http-method>HEAD</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>SEC_LOGIN</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-role>
+        <description>Rol básico que con el que debe contar el usuario para acceder a la api.</description>
+        <role-name>SEC_LOGIN</role-name>
+    </security-role>
+
+
+    <login-config>
+        <auth-method>KEYCLOAK</auth-method>
+        <realm-name>Backend</realm-name>
+    </login-config>
 </web-app>
