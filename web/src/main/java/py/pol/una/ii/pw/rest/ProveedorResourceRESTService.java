@@ -176,7 +176,7 @@ public class ProveedorResourceRESTService {
             // ignore
         }
         if(proveedor !=null){
-	        if (proveedor.getId()==id)
+	        if (proveedor.getId().equals(id))
 	        	proveedor=null;
         }
         return proveedor != null;

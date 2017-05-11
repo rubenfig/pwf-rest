@@ -16,10 +16,12 @@
  */
 package py.pol.una.ii.pw.rest;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.Logger;
+import py.pol.una.ii.pw.data.ClienteRepository;
+import py.pol.una.ii.pw.data.PagoRepository;
+import py.pol.una.ii.pw.model.Cliente;
+import py.pol.una.ii.pw.model.Pago;
+import py.pol.una.ii.pw.service.ClienteRegistration;
+import py.pol.una.ii.pw.service.PagoRegistration;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -27,22 +29,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import py.pol.una.ii.pw.data.ClienteRepository;
-import py.pol.una.ii.pw.data.PagoRepository;
-import py.pol.una.ii.pw.model.Cliente;
-import py.pol.una.ii.pw.model.Pago;
-import py.pol.una.ii.pw.service.ClienteRegistration;
-import py.pol.una.ii.pw.service.PagoRegistration;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * JAX-RS Example
@@ -99,7 +90,6 @@ public class PagoResourceRESTService {
         try {
             // Validates pago using bean validation
             validatePago(pago);
-            DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
             Date today = Calendar.getInstance().getTime();
             pago.setFecha(today);
             registration.register(pago);

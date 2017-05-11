@@ -5,7 +5,7 @@
 
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>Login</web-resource-name>
+            <web-resource-name>Backend</web-resource-name>
             <url-pattern>/rest/*</url-pattern>
             <http-method>GET</http-method>
             <http-method>PUT</http-method>

@@ -13,8 +13,6 @@ import py.pol.una.ii.pw.model.Venta;
 import py.pol.una.ii.pw.util.EjbInterceptor;
 import py.pol.una.ii.pw.util.Factory;
 
-import javax.annotation.Resource;
-import javax.ejb.EJBContext;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
@@ -22,7 +20,6 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 import javax.persistence.EntityManager;
-import javax.transaction.UserTransaction;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -54,10 +51,7 @@ public class VentaMasivaRegistration {
     @Inject
     private ProductoRepository repoProducto;
 
-    @Resource
-    private EJBContext context;
 
-    private UserTransaction tx;
 
     private SqlSession sqlSession;
 

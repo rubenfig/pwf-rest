@@ -26,9 +26,7 @@ public class AuthenticationService {
         // authentication. Example "Basic YWRtaW46YWRtaW4="
         final String encodedUserPassword = authCredentials.replaceFirst("Basic"
                 + " ", "");
-
-        String usernameAndPassword = null;
-
+        String usernameAndPassword = "";
         try {
             byte[] decodedBytes = Base64.decodeBase64(
                     encodedUserPassword);

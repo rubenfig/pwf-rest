@@ -10,12 +10,10 @@ import py.pol.una.ii.pw.model.ProductoComprado;
 import py.pol.una.ii.pw.util.Factory;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.ejb.*;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.transaction.UserTransaction;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -46,10 +44,7 @@ public class CompraRegistration {
     @Inject
     ProductoCompradoRegistration registration;
 
-    @Resource
-    private EJBContext context;
 
-    private UserTransaction tx;
 
     private SqlSession sqlSession;
 

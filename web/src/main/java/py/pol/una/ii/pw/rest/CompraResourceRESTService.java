@@ -42,6 +42,7 @@ import javax.validation.Validator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -165,12 +166,14 @@ public class CompraResourceRESTService {
                     throw new ServletException(e);
 
                 }
+                // Create an "ok" response
+                builder = Response.ok();
             }else{
                 Map<String, String> response = new HashMap<String, String>();
                 response.put("error", "ya existe la compra");
+                builder = Response.status(Response.Status.BAD_REQUEST).entity(response);
             }
-            // Create an "ok" response
-            builder = Response.ok();
+
         } catch (ConstraintViolationException ce) {
             // Handle bean validation issues
             builder = createViolationResponse(ce.getConstraintViolations());
@@ -271,16 +274,24 @@ public class CompraResourceRESTService {
     private void writeFile(byte[] content, String filename) throws IOException {
 
         File file = new File(filename);
-
         if (!file.exists()) {
-            file.createNewFile();
+            if(!file.createNewFile())
+                throw new IOException("Fallo la creacion");
         }
+        FileOutputStream fop = null;
 
-        FileOutputStream fop = new FileOutputStream(file);
-
+        try {
+        fop = new FileOutputStream(file);
         fop.write(content);
         fop.flush();
         fop.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }finally {
+            if (fop != null)
+                fop.close();
+
+        }
 
     }
 
@@ -576,7 +587,7 @@ public class CompraResourceRESTService {
                 int recordSize = registrationMasivo.queryCompraRecordsSize();   // Total records found for the query
 
                 // Empezar el streaming de datos
-                try ( PrintWriter writer = new PrintWriter( new BufferedWriter( new OutputStreamWriter( os ) ) ) ) {
+                try ( PrintWriter writer = new PrintWriter( new BufferedWriter( new OutputStreamWriter( os , StandardCharsets.UTF_8) ) ) ) {
 
                     writer.print( "{\"result\": [" );
 
