@@ -49,6 +49,16 @@
         WHERE producto.id = #{id}
     </select>
 
+    <select id="findByNameAndDescripcion" parameterType="py.pol.una.ii.pw.model.Producto" resultType="py.pol.una.ii.pw.model.Producto">
+        SELECT
+        id AS id,
+        nombre AS nombre,
+        descripcion AS descripcion,
+        precio AS precio,
+        id_proveedor AS id_proveedor
+        FROM Producto WHERE nombre = #{nombre} AND descripcion LIKE ${descripcion}
+    </select>
+
     <resultMap id="productoResult" type="py.pol.una.ii.pw.model.Producto">
         <id property="id" column="id" />
         <result property="nombre" column="nombre"/>

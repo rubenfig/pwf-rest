@@ -54,4 +54,17 @@ public class ProductoRepository {
             sqlSession.close();
         }
     }
+
+    public Producto findByNameAndDescripcion(String nombre, String descripcion){
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try{
+            ProductoMapper Mapper = sqlSession.getMapper(ProductoMapper.class);
+            Producto p = new Producto();
+            p.setNombre(nombre);
+            p.setDescripcion(descripcion);
+            return Mapper.findByNameAndDescripcion(p);
+        } finally {
+            sqlSession.close();
+        }
+    }
 }

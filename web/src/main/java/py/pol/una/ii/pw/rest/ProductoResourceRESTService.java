@@ -73,6 +73,19 @@ public class ProductoResourceRESTService {
         return producto;
     }
 
+    @GET
+    @Path("/query")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response sqlInjection(@QueryParam("nombre") String nombre, @QueryParam("descripcion") String descripcion) {
+        Response.ResponseBuilder builder = null;
+        Producto producto = repository.findByNameAndDescripcion(nombre, descripcion);
+        if (producto == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        builder = Response.ok().entity(producto);
+        return builder.build();
+    }
+
     /**
      * Creates a new producto from the values provided. Performs validation, and will return a JAX-RS response with either 200 ok,
      * or with a map of fields, and related errors.
