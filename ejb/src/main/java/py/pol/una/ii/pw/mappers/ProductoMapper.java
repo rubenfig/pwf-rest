@@ -2,7 +2,6 @@ package py.pol.una.ii.pw.mappers;
 
 import py.pol.una.ii.pw.model.Producto;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,5 +21,5 @@ public interface ProductoMapper {
 
     void delete(long id);
 
-    Producto findByNameAndDescripcion(Producto p);
+    List<Producto> findByNameAndDescripcion(Producto p);
 }

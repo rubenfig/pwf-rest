@@ -55,7 +55,7 @@ public class ProductoRepository {
         }
     }
 
-    public Producto findByNameAndDescripcion(String nombre, String descripcion){
+    public List<Producto> findByNameAndDescripcion(String nombre, String descripcion){
         SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
         try{
             ProductoMapper Mapper = sqlSession.getMapper(ProductoMapper.class);
