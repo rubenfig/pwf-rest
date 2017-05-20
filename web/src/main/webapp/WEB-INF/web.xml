@@ -3,6 +3,15 @@
 
     <module-name>backend</module-name>
 
+    <!--Para que una url salte el keycloak
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Backend</web-resource-name>
+            <url-pattern>/info</url-pattern>
+        </web-resource-collection>
+        &lt;!&ndash; OMIT auth-constraint &ndash;&gt;
+    </security-constraint>-->
+
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Backend</web-resource-name>

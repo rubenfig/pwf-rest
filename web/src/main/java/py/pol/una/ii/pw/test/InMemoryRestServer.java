@@ -37,7 +37,6 @@ import java.util.Set;
  */
 
 public class InMemoryRestServer implements AutoCloseable {
-    private final int PORT = 9005;
 
     private int port;
 
@@ -46,11 +45,6 @@ public class InMemoryRestServer implements AutoCloseable {
 
     private TJWSEmbeddedJaxrsServer server;
     private SecurityDomain securityDomain;
-
-    public ResteasyClient getResteasyClient() {
-        return resteasyClient;
-    }
-
     private ResteasyClient resteasyClient;
     private String bindAddress = "localhost";
 
@@ -104,11 +98,12 @@ public class InMemoryRestServer implements AutoCloseable {
 
     private void start() throws IOException {
 
-        port = PORT;
+        port = findFreePort();
 
         server = new TJWSEmbeddedJaxrsServer();
         server.setPort(port);
         server.setBindAddress(bindAddress);
+        server.setSecurityDomain(securityDomain);
 
         for (Object object : objects) {
             if (object instanceof Application) {
@@ -134,7 +129,7 @@ public class InMemoryRestServer implements AutoCloseable {
      * @return baseURI (http://localhost:PORT) to the REST server.
      */
     public String baseUri() {
-        return "http://" + bindAddress + ":" + port;
+        return "http://" + bindAddress + ":" + port + "/rest";
     }
 
     /**
