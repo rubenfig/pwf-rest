@@ -102,8 +102,7 @@ public class ProductoServiceTest extends BaseServiceTest{
         requestEntity.putSingle("id", String.valueOf(id));
         return server.newRequest(RESOURCE_PATH+"/"+String.valueOf(id))
                 .request()
-                .buildPost(Entity.form(requestEntity))
-                .invoke();
+                .get();
     }
 
 }

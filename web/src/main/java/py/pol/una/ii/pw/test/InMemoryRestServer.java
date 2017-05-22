@@ -129,7 +129,7 @@ public class InMemoryRestServer implements AutoCloseable {
      * @return baseURI (http://localhost:PORT) to the REST server.
      */
     public String baseUri() {
-        return "http://" + bindAddress + ":" + port + "/rest";
+        return "http://" + bindAddress + ":" + port;
     }
 
     /**
