@@ -1,5 +1,7 @@
 package py.pol.una.ii.pw.test;
 
+import com.google.gson.Gson;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -20,6 +22,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -140,11 +143,13 @@ public class ProductoServiceTest extends BaseServiceTest{
     }
 
     @Test
-    public void createProductoRetornaBadRequest() throws Exception {
-        doThrow(new Exception()).when(productoRegistration).register(producto);
-        response = llamarServicioPOST(producto);
-        Assert.assertEquals("Deben devolver un 400",
-                Response.Status.BAD_REQUEST.getStatusCode(),
+    public void modificarProductoRetornaSuccess() throws Exception {
+        when(productoRepository.findById(producto.getId())).thenReturn(producto);
+        response = server.newRequest(RESOURCE_PATH+"/"+String.valueOf(producto.getId()))
+                .request().buildPut(Entity.json(producto)).invoke();
+
+        Assert.assertEquals("Deben devolver un 200",
+                Response.Status.OK.getStatusCode(),
                 response.getStatus());
     }
 
