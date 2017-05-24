@@ -10,16 +10,17 @@ import py.pol.una.ii.pw.model.Proveedor;
 import py.pol.una.ii.pw.rest.ProveedorResourceRESTService;
 import py.pol.una.ii.pw.service.ProveedorRegistration;
 
-import javax.validation.ValidationException;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.xml.validation.Validator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -75,7 +76,8 @@ public class ProveedorResourceRESTServiceTest extends BaseServiceTest {
         when(proveedorRepository.findAllOrderedByName("","","")).thenReturn(listaProveedores);
         when(proveedorRepository.findById(ID_PROVEEDOR_EXISTENTE)).thenReturn(proveedor);
         when(proveedorRepository.findById(ID_PROVEEDOR_INEXISTENTE)).thenReturn(null);
-
+        Set<ConstraintViolation<Proveedor>> violations = Collections.emptySet();
+        when(validator.validate(proveedor)).thenReturn(violations);
     }
 
     @After

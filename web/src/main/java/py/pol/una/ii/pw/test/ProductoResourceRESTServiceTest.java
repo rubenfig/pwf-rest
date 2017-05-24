@@ -11,6 +11,7 @@ import py.pol.una.ii.pw.model.Producto;
 import py.pol.una.ii.pw.model.Proveedor;
 import py.pol.una.ii.pw.service.ProductoRegistration;
 
+import javax.validation.Validator;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -56,6 +57,9 @@ public class ProductoResourceRESTServiceTest extends BaseServiceTest{
 
     @Mock
     private ProductoRegistration productoRegistration;
+
+    @Mock
+    Validator validator;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
