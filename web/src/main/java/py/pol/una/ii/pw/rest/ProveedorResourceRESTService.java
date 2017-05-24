@@ -89,7 +89,7 @@ public class ProveedorResourceRESTService {
 
         try {
             // Validates proveedor using bean validation
-            validateProveedor(proveedor);
+            //validateProveedor(proveedor);
 
             registration.register(proveedor);
 
@@ -197,7 +197,7 @@ public class ProveedorResourceRESTService {
         try {
             // Validates proveedor using bean validation
             proveedor.setId(id);
-            validateProveedor(proveedor);
+            //validateProveedor(proveedor);
             registration.update(proveedor);
 
             // Create an "ok" response

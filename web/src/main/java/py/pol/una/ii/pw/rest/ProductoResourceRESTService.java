@@ -86,7 +86,7 @@ public class ProductoResourceRESTService {
         try {
             // Validates producto using bean validation
             producto.setProveedor(proveedorRepository.findById(producto.getProveedor().getId()));
-            validateProducto(producto);
+            //validateProducto(producto);
 
             registration.register(producto);
 
@@ -192,7 +192,7 @@ public class ProductoResourceRESTService {
 
         try {
             // Validates producto using bean validation
-            validateProducto(producto);
+            //validateProducto(producto);
             producto.setId(id);
             registration.update(producto);
 
@@ -222,6 +222,7 @@ public class ProductoResourceRESTService {
     public Producto deleteProductoById(@PathParam("id") long id) {
         Producto producto = null;
     	try {
+    	    producto = repository.findById(id);
         	registration.remove(id);
             if (producto == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
