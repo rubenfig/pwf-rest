@@ -1,5 +1,6 @@
 package py.pol.una.ii.pw.test;
 
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -19,16 +20,16 @@ import javax.servlet.http.HttpSession;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +49,8 @@ public class VentaResourceRESTServiceTest extends BaseServiceTest {
             NOMBRE_PRODUCTO = "producto1",
             NOMBRE_PROVEEDOR = "proveedor1",
             EMAIL_PROVEEDOR = "pruebaemail@gmail.com",
-            TELEFONO_PROVEEDOR = "123456789";
+            TELEFONO_PROVEEDOR = "123456789",
+            TEXTO_CORRECTO = "Un texto correcto";
 
     private static final long ID_CLIENTE_EXISTENTE = 1000L,
             ID_VENTA_EXISTENTE = 1500L,
@@ -167,6 +169,7 @@ public class VentaResourceRESTServiceTest extends BaseServiceTest {
 
     @Test
     public void crearVentaRetornaSuccess() throws Exception {
+        when(registrationMasivo.registerVentasMasivas("/home/carlitos/desconocido")).thenReturn("");
         response = server.newRequest(RESOURCE_PATH).request().buildPost(Entity.json(venta)).invoke();
 
         Assert.assertEquals("Deben devolver un 200",
@@ -174,7 +177,7 @@ public class VentaResourceRESTServiceTest extends BaseServiceTest {
                 response.getStatus());
     }
 
-    @Test
+    /*@Test
     public void crearVentaCarritoRetornaSuccess() throws Exception {
         HttpServletRequest stubHttpServletRequest = mock(HttpServletRequest.class);
         HttpServletResponse stubHttpServletResponse = mock(HttpServletResponse.class);
@@ -184,15 +187,31 @@ public class VentaResourceRESTServiceTest extends BaseServiceTest {
         when(stubHttpSession.getAttribute("venta")).thenReturn("algo");
         response = server.newRequest(RESOURCE_PATH + "/iniciar").request().buildPost(Entity.json(venta)).invoke();
     }
+    @Test
+    public void ventasMasivasRetornaSucess() throws Exception {
+        MultipartFormDataOutput multipartFormDataOutput = new MultipartFormDataOutput();
+        multipartFormDataOutput.addFormData("uploadedFile", " aksldfjalsd ", MediaType.TEXT_PLAIN_TYPE);
+
+        response = server.newRequest(RESOURCE_PATH + "/masivas")
+                .request()
+                .post(Entity.entity(multipartFormDataOutput, MediaType.MULTIPART_FORM_DATA));
+    }*/
 
     @Test
-    public void testDoProcess() throws Exception {
-        HttpServletRequest stubHttpServletRequest = mock(HttpServletRequest.class);
-        HttpServletResponse stubHttpServletResponse = mock(HttpServletResponse.class);
-        HttpSession stubHttpSession = mock(HttpSession.class);
+    public void listarVentasPaginadoRetornaSuccess() throws Exception {
+        when(registrationMasivo.queryVentaRecordsSize()).thenReturn(1);
+        when(registrationMasivo.listAllVentaEntities(0,100)).thenReturn(ventas);
+        response = server.newRequest(RESOURCE_PATH+"/list").request().get();
 
-        when(stubHttpServletRequest.getSession()).thenReturn(stubHttpSession);
-        when(stubHttpSession.getAttribute("venta")).thenReturn("algo");
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void listarVentasPaginadoRetornaExcepcion() throws Exception {
+        doThrow(new RuntimeException()).when(registrationMasivo).queryVentaRecordsSize();
+        response = server.newRequest(RESOURCE_PATH+"/list").request().get();
+
+        Assert.assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
     }
 
 

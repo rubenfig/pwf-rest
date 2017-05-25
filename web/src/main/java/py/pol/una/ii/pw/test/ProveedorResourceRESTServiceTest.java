@@ -4,7 +4,9 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 import py.pol.una.ii.pw.data.ProveedorRepository;
 import py.pol.una.ii.pw.model.Proveedor;
 import py.pol.una.ii.pw.rest.ProveedorResourceRESTService;
@@ -16,11 +18,15 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -117,7 +123,13 @@ public class ProveedorResourceRESTServiceTest extends BaseServiceTest {
 
     /*@Test
     public void errorAlCrearProveedorRetornaBadRequest() throws Exception {
-        doThrow(new Exception()).when(proveedorRegistration).register(proveedor);
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+
+                return null;
+            }
+        }).when(proveedorRegistration).register((Proveedor) anyObject());
         response = llamarServicioPOST(proveedor);
         Assert.assertEquals("Deben devolver un 400",
                 Response.Status.BAD_REQUEST.getStatusCode(),
