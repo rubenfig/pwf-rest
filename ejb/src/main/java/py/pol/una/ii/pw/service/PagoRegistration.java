@@ -16,7 +16,10 @@
  */
 package py.pol.una.ii.pw.service;
 
+import org.apache.ibatis.session.SqlSession;
+import py.pol.una.ii.pw.mappers.PagoMapper;
 import py.pol.una.ii.pw.model.Pago;
+import py.pol.una.ii.pw.util.Factory;
 
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
@@ -38,8 +41,14 @@ public class PagoRegistration {
     private Event<Pago> pagoEventSrc;
 
     public void register(Pago pago) throws Exception {
-        log.info("Registering " + pago.getId());
-        em.persist(pago);
-        pagoEventSrc.fire(pago);
+        log.info("Registrando pago en fecha: " + pago.getFecha());
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            PagoMapper Mapper = sqlSession.getMapper(PagoMapper.class);
+            Mapper.register(pago);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 }

@@ -1,16 +1,10 @@
 package py.pol.una.ii.pw.model;
 
-import java.io.Serializable;
-import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @XmlRootElement
@@ -53,11 +47,13 @@ public class Pago implements Serializable {
 	}
 
 	public Date getFecha() {
-		return fecha;
+		Date asd = fecha;
+		return asd;
 	}
 
 	public void setFecha(Date fecha) {
-		this.fecha = fecha;
+		Date asd = new Date(fecha.getTime());
+		this.fecha = asd;
 	}
 
 	public Float getMonto() {

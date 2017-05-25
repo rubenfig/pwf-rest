@@ -1,6 +1,9 @@
 package py.pol.una.ii.pw.service;
 
+import org.apache.ibatis.session.SqlSession;
+import py.pol.una.ii.pw.mappers.ProductoMapper;
 import py.pol.una.ii.pw.model.Producto;
+import py.pol.una.ii.pw.util.Factory;
 
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
@@ -24,20 +27,36 @@ public class ProductoRegistration {
 
     public void register(Producto producto) throws Exception {
         log.info("Registrando " + producto.getNombre());
-        em.persist(producto);
-        productoEventSrc.fire(producto);
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            ProductoMapper Mapper = sqlSession.getMapper(ProductoMapper.class);
+            Mapper.register(producto);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
     
     public void update(Producto producto) throws Exception {
-    	log.info("Actualizando Producto, el nuevo nombre es: " + producto.getNombre());
-    	em.merge(producto);
-    	em.flush();
-    	productoEventSrc.fire(producto);
+        log.info("Actualizando Producto, el nuevo nombre es: " + producto.getNombre());
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            ProductoMapper Mapper = sqlSession.getMapper(ProductoMapper.class);
+            Mapper.update(producto);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
     
-    public void remove(Producto producto) throws Exception {
-    	producto = em.merge(producto);
-    	em.remove(producto);
-    	em.flush();
+    public void remove(long id) throws Exception {
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            ProductoMapper Mapper = sqlSession.getMapper(ProductoMapper.class);
+            Mapper.delete(id);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 }

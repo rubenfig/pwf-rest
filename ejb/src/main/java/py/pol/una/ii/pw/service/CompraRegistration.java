@@ -1,21 +1,25 @@
 package py.pol.una.ii.pw.service;
 
+import org.apache.ibatis.session.SqlSession;
 import py.pol.una.ii.pw.data.ProveedorRepository;
+import py.pol.una.ii.pw.mappers.CompraMapper;
+import py.pol.una.ii.pw.mappers.ProductoCompradoMapper;
 import py.pol.una.ii.pw.model.Compra;
 import py.pol.una.ii.pw.model.Producto;
 import py.pol.una.ii.pw.model.ProductoComprado;
+import py.pol.una.ii.pw.util.Factory;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.ejb.*;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.transaction.UserTransaction;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -40,12 +44,15 @@ public class CompraRegistration {
     @Inject
     ProductoCompradoRegistration registration;
 
-    @Resource
-    private EJBContext context;
 
-    private UserTransaction tx;
+
+    private SqlSession sqlSession;
 
     private Compra compra_actual;
+
+    private CompraMapper Mapper;
+
+    private ProductoCompradoMapper mapperProducto;
 
     @PostConstruct
     public void initializateBean(){
@@ -60,26 +67,36 @@ public class CompraRegistration {
         compra.setFecha(reportDate);
 
     	log.info("Registrando compra de:" + compra.getProveedor());
-    	tx=context.getUserTransaction();
     	compra_actual=compra;
-    	tx.begin();
-    	em.persist(compra_actual);
-        compraEventSrc.fire(compra);
+        sqlSession = Factory.getSqlSessionFactory().openSession();
+        Mapper = sqlSession.getMapper(CompraMapper.class);
+        mapperProducto = sqlSession.getMapper(ProductoCompradoMapper.class);
+        Mapper.register(compra_actual);
+        int n=compra_actual.getProductos().size();
+        for(int i=0;i<n;i++)
+            this.agregarCarrito(compra_actual.getProductos().get(i));
     }
 
     public void agregarCarrito (ProductoComprado pc) throws Exception{
+        mapperProducto.register(pc);
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("id_compra", compra_actual.getId());
+        param.put("id_productocomprado", pc.getId());
+        Mapper.addProducto(param);
         compra_actual.getProductos().add(pc);
-        em.persist(compra_actual);
     }
 
     public void removeItem(Producto p) throws Exception{
         boolean bandera = false;
+        Map<String, Object> param = new HashMap<String, Object>();
         int n=compra_actual.getProductos().size();
         for(int i=0;i<n;i++){
             ProductoComprado pc = compra_actual.getProductos().get(i);
             if(p.getId().equals(pc.getProducto().getId())){
                 compra_actual.getProductos().remove(i);
-                em.persist(compra_actual);
+                param.put("id_compra", compra_actual.getId());
+                param.put("id_productocomprado", pc.getId());
+                Mapper.deleteProducto(param);
                 bandera = true;
                 n--;
             }
@@ -90,24 +107,43 @@ public class CompraRegistration {
 
     @Remove
     public void completarCompra() throws Exception {
-        tx.commit();
+        try {
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
+
     }
 
     @Remove
     public void cancelarCompra() throws Exception {
-        tx.rollback();
+        try {
+            sqlSession.rollback();
+        } finally {
+            sqlSession.close();
+        }
     }
     
     public void update(Compra compra) throws Exception {
     	log.info("Actualizando Compra, el nuevo nombre es: " + compra.getId());
-    	em.merge(compra);
-    	em.flush();
-    	compraEventSrc.fire(compra);
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            CompraMapper mapper = sqlSession.getMapper(CompraMapper.class);
+            mapper.update(compra);
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
     
     public void remove(Compra compra) throws Exception {
-    	compra = em.merge(compra);
-    	em.remove(compra);
-    	em.flush();
+        SqlSession sqlSession = Factory.getSqlSessionFactory().openSession();
+        try {
+            CompraMapper mapper = sqlSession.getMapper(CompraMapper.class);
+            mapper.delete(compra.getId());
+            sqlSession.commit();
+        } finally {
+            sqlSession.close();
+        }
     }
 }

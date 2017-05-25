@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="py.pol.una.ii.pw.mappers.VentaMasivaMapper">
+    <select id="ventaRecordSize" resultType="int">
+        select count(u) from (select venta.id as id_venta, venta.fecha as fecha_venta,
+        productocomprado.cantidad as cantidad_producto,
+        productocomprado.producto as id_producto,
+        producto.descripcion as descripcion_producto,
+        producto.nombre as nombre_producto,
+        producto.precio as precio_producto,
+        producto.id_proveedor as proveedor_producto,
+        venta.id_cliente as cliente_venta,
+        cliente.email as email_cliente, cliente.name as nombre_cliente,
+        cliente.phone_number as tel_cliente,
+        cliente.cuenta as cuenta_cliente
+        from venta
+        left outer join ventas_productos on venta.id = ventas_productos.id_venta
+        left outer join productocomprado on ventas_productos.id_productocomprado = productocomprado.id
+        left outer join producto on productocomprado.producto = producto.id
+        left outer join cliente on venta.id_cliente = cliente.id) u
+    </select>
+
+    <sql id="recursoColumns">
+        SELECT
+        venta.id AS id,
+        venta.fecha AS fecha,
+        cliente.id AS id_cliente,
+        cliente.email AS email_cliente,
+        cliente.name AS nombre_cliente,
+        cliente.phone_number AS telefono_cliente,
+        cliente.cuenta AS cuenta_cliente,
+        productocomprado.id as id_pc,
+        productocomprado.cantidad as cantidad,
+        productocomprado.producto as id_producto,
+        producto.descripcion as descripcion_producto,
+        producto.nombre as nombre_producto,
+        producto.precio as precio_producto,
+        producto.id_proveedor as proveedor_producto,
+        proveedor.nombre as nombre_proveedor,
+        proveedor.email as email_proveedor,
+        proveedor.telefono as telefono_proveedor
+        FROM
+        (select * from venta limit #{limit} offset #{offset}) as
+        venta LEFT OUTER JOIN cliente on venta.id_cliente = cliente.id
+        left outer join ventas_productos on ventas_productos.id_venta = venta.id
+        left outer join productocomprado on productocomprado.id = ventas_productos.id_productocomprado
+        left outer join producto on productocomprado.producto = producto.id
+        left outer join proveedor on producto.id_proveedor = proveedor.id
+
+    </sql>
+
+    <select id="listAll" parameterType="map" flushCache="true"
+            resultMap="ventaResult">
+        <include refid="recursoColumns" />
+        order by venta.id
+    </select>
+
+    <resultMap id="ventaResult" type="py.pol.una.ii.pw.model.Venta">
+        <id property="id" column="id" />
+        <result property="fecha" column="fecha"/>
+        <association property="cliente" javaType="py.pol.una.ii.pw.model.Cliente">
+            <id property="id" column="id_cliente"/>
+            <result property="email" column="email_cliente"/>
+            <result property="name" column="nombre_cliente"/>
+            <result property="phoneNumber" column="telefono_cliente"/>
+            <result property="cuenta" column="cuenta_cliente"/>
+        </association>
+        <collection javaType="ArrayList" property="productos" resultMap="ProductoCompradoResult" />
+    </resultMap>
+
+    <resultMap id="ProductoCompradoResult" type="py.pol.una.ii.pw.model.ProductoComprado">
+        <id property="id" column="id_pc" />
+        <result property="cantidad" column="cantidad"/>
+        <association property="producto" javaType="py.pol.una.ii.pw.model.Producto">
+            <id property="id" column="id_producto"/>
+            <result property="nombre" column="nombre_producto"/>
+            <result property="descripcion" column="descripcion_producto"/>
+            <result property="precio" column="precio_producto"/>
+            <association property="proveedor" javaType="py.pol.una.ii.pw.model.Proveedor">
+                <id property="id" column="proveedor_producto"/>
+                <result property="email" column="email_proveedor"/>
+                <result property="nombre" column="nombre_proveedor"/>
+                <result property="telefono" column="telefono_proveedor"/>
+            </association>
+        </association>
+    </resultMap>
+
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="py.pol.una.ii.pw.mappers.ClienteMapper">
+
+    <select id="findAllOrderedByName" parameterType="map" flushCache="true"
+            resultType="py.pol.una.ii.pw.model.Cliente">
+        SELECT
+        id AS id,
+        name AS name,
+        phone_number AS phoneNumber,
+        email AS email,
+        cuenta AS cuenta
+        FROM Cliente
+        <where>
+                <if test="name != null">
+                    AND name LIKE '%' || #{name} || '%'
+                </if>
+
+                <if test="email != null">
+                    AND email LIKE '%' || #{email} || '%'
+                </if>
+                <if test="phoneNumber != null">
+                    AND phone_number = '%' || #{phoneNumber} || '%'
+                </if>
+
+        </where>
+    </select>
+
+    <select id="findById" parameterType="long" resultType="py.pol.una.ii.pw.model.Cliente">
+        SELECT id AS id,
+        name AS name,
+        phone_number AS phoneNumber,
+        email AS email,
+        cuenta AS cuenta FROM Cliente WHERE id = #{id}
+    </select>
+
+    <insert id="register" parameterType="py.pol.una.ii.pw.model.Cliente" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="id">
+        INSERT INTO Cliente (name, email, phone_number, cuenta)
+        VALUES (#{name},
+                #{email},
+                #{phoneNumber},
+                #{cuenta})
+    </insert>
+
+    <update id="update" parameterType="py.pol.una.ii.pw.model.Cliente">
+        UPDATE cliente
+        SET name= #{name},
+        email= #{email},
+        phone_number = #{phoneNumber},
+        cuenta = #{cuenta}
+        where id = #{id}
+    </update>
+
+    <update id="updateCuenta" parameterType="py.pol.una.ii.pw.model.Cliente">
+        UPDATE cliente
+        SET cuenta = #{cuenta}
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM cliente WHERE id = #{id}
+    </delete>
+</mapper>

@@ -3,25 +3,21 @@ package py.pol.una.ii.pw.model;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 
 @Entity
 @XmlRootElement
 @Table(name = "Compra")
+@NamedQueries( {
+        @NamedQuery( name = "Compra.listAll", query = "SELECT u FROM Compra u" ),
+        @NamedQuery( name = "Compra.queryRecordsSize", query = "SELECT count(u) FROM Compra u" )})
 public class Compra implements Serializable {
     /** Default value included to remove warning. Remove or modify at will. **/
     private static final long serialVersionUID = 1L;
@@ -45,7 +41,7 @@ public class Compra implements Serializable {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "compras_productos", joinColumns = @JoinColumn(name = "id_Compra"), inverseJoinColumns = @JoinColumn(name = "id_ProductoComprado"))
     private List<ProductoComprado> productos;
-	
+
     public List<ProductoComprado> getProductos() {
 		return productos;
 	}

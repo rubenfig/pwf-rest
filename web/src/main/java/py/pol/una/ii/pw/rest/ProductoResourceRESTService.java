@@ -1,11 +1,9 @@
 package py.pol.una.ii.pw.rest;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
+import py.pol.una.ii.pw.data.ProductoRepository;
+import py.pol.una.ii.pw.data.ProveedorRepository;
+import py.pol.una.ii.pw.model.Producto;
+import py.pol.una.ii.pw.service.ProductoRegistration;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -14,22 +12,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import py.pol.una.ii.pw.data.ProductoRepository;
-import py.pol.una.ii.pw.model.Producto;
-import py.pol.una.ii.pw.service.ProductoRegistration;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * JAX-RS Example
@@ -47,6 +34,9 @@ public class ProductoResourceRESTService {
 
     @Inject
     private ProductoRepository repository;
+
+    @Inject
+    private ProveedorRepository proveedorRepository;
 
     @Inject
     ProductoRegistration registration;
@@ -69,6 +59,19 @@ public class ProductoResourceRESTService {
         return producto;
     }
 
+    @GET
+    @Path("/query")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response sqlInjection(@QueryParam("nombre") String nombre, @QueryParam("descripcion") String descripcion) {
+        Response.ResponseBuilder builder = null;
+        List<Producto> producto = repository.findByNameAndDescripcion(nombre, descripcion);
+        if (producto == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        builder = Response.ok().entity(producto);
+        return builder.build();
+    }
+
     /**
      * Creates a new producto from the values provided. Performs validation, and will return a JAX-RS response with either 200 ok,
      * or with a map of fields, and related errors.
@@ -82,6 +85,7 @@ public class ProductoResourceRESTService {
 
         try {
             // Validates producto using bean validation
+            producto.setProveedor(proveedorRepository.findById(producto.getProveedor().getId()));
             validateProducto(producto);
 
             registration.register(producto);
@@ -161,7 +165,7 @@ public class ProductoResourceRESTService {
      * Checks if a producto with the same email address is already registered. This is the only way to easily capture the
      * "@UniqueConstraint(columnNames = "email")" constraint from the Producto class.
      * 
-     * @param email The email to check
+     * @param descripcion The email to check
      * @return True if the email already exists, and false otherwise
      */
     public boolean descripcionAlreadyExists(String descripcion) {
@@ -218,8 +222,7 @@ public class ProductoResourceRESTService {
     public Producto deleteProductoById(@PathParam("id") long id) {
         Producto producto = null;
     	try {
-        	producto = repository.findById(id);
-        	registration.remove(producto);
+        	registration.remove(id);
             if (producto == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }

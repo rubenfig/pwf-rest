@@ -16,21 +16,29 @@
  */
 package py.pol.una.ii.pw.service;
 
+import org.apache.ibatis.session.SqlSession;
 import py.pol.una.ii.pw.data.ClienteRepository;
 import py.pol.una.ii.pw.data.ProductoRepository;
-import py.pol.una.ii.pw.model.*;
+import py.pol.una.ii.pw.mappers.ClienteMapper;
+import py.pol.una.ii.pw.mappers.ProductoCompradoMapper;
+import py.pol.una.ii.pw.mappers.VentaMapper;
+import py.pol.una.ii.pw.model.Cliente;
+import py.pol.una.ii.pw.model.Producto;
+import py.pol.una.ii.pw.model.ProductoComprado;
+import py.pol.una.ii.pw.model.Venta;
+import py.pol.una.ii.pw.util.Factory;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.ejb.*;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.transaction.UserTransaction;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -60,12 +68,16 @@ public class VentaRegistration {
 
     private Cliente cliente;
 
-    @Resource
-    private EJBContext context;
 
-    private UserTransaction tx;
 
     private Venta venta_actual;
+
+    private VentaMapper Mapper;
+
+    private ProductoCompradoMapper mapperProducto;
+
+    private SqlSession sqlSession;
+
 
     @PostConstruct
     public void initializateBean(){
@@ -80,26 +92,36 @@ public class VentaRegistration {
         venta.setFecha(reportDate);
 
         log.info("Registrando venta de:" + venta.getCliente());
-        tx=context.getUserTransaction();
         venta_actual=venta;
-        tx.begin();
-        em.persist(venta_actual);
-        ventaEventSrc.fire(venta);
+        sqlSession = Factory.getSqlSessionFactory().openSession();
+        Mapper = sqlSession.getMapper(VentaMapper.class);
+        mapperProducto = sqlSession.getMapper(ProductoCompradoMapper.class);
+        Mapper.register(venta_actual);
+        int n=venta_actual.getProductos().size();
+        for(int i=0;i<n;i++)
+            this.agregarCarrito(venta_actual.getProductos().get(i));
     }
 
     public void agregarCarrito (ProductoComprado pc) throws Exception{
+        mapperProducto.register(pc);
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("id_venta", venta_actual.getId());
+        param.put("id_productocomprado", pc.getId());
+        Mapper.addProducto(param);
         venta_actual.getProductos().add(pc);
-        em.persist(venta_actual);
     }
 
     public void removeItem(Producto p) throws Exception{
         boolean bandera = false;
+        Map<String, Object> param = new HashMap<String, Object>();
         int n=venta_actual.getProductos().size();
         for(int i=0;i<n;i++){
             ProductoComprado pc = venta_actual.getProductos().get(i);
             if(p.getId().equals(pc.getProducto().getId())){
                 venta_actual.getProductos().remove(i);
-                em.persist(venta_actual);
+                param.put("id_venta", venta_actual.getId());
+                param.put("id_productocomprado", pc.getId());
+                Mapper.deleteProducto(param);
                 bandera = true;
                 n--;
             }
@@ -111,7 +133,6 @@ public class VentaRegistration {
     @Remove
     public void completarVenta()  {
         try {
-            tx.commit();
             cliente = repoCliente.findById(venta_actual.getCliente().getId());
             //Agregar cuenta de cliente
             Float cuenta = cliente.getCuenta();
@@ -120,17 +141,25 @@ public class VentaRegistration {
                 cuenta = cuenta + (p.getPrecio() * pc.getCantidad());
             }
             cliente.setCuenta(cuenta);
-            regCliente.update(cliente);
+            ClienteMapper mapperCliente = sqlSession.getMapper(ClienteMapper.class);
+            mapperCliente.updateCuenta(cliente);
+            sqlSession.commit();
 
         } catch (Exception e){
             System.out.println("Fallo el commit");
+        } finally {
+            sqlSession.close();
         }
 
     }
 
     @Remove
     public void cancelarVenta() throws Exception {
-        tx.rollback();
+        try {
+            sqlSession.rollback();
+        } finally {
+            sqlSession.close();
+        }
     }
 
 

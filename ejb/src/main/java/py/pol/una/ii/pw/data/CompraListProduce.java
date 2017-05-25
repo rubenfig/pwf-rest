@@ -1,5 +1,7 @@
 package py.pol.una.ii.pw.data;
 
+import py.pol.una.ii.pw.model.Compra;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
@@ -8,8 +10,6 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.List;
-
-import py.pol.una.ii.pw.model.Compra;
 
 @RequestScoped
 public class CompraListProduce {
@@ -33,6 +33,6 @@ public class CompraListProduce {
 
     @PostConstruct
     public void retrieveAllComprasOrderedByName() {
-        compras = compraRepository.findAllOrderedByName();
+        compras = compraRepository.findAllOrderedByName(null);
     }
 }

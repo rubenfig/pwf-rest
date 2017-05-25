@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="py.pol.una.ii.pw.mappers.CompraMapper">
+    <sql id="recursoColumns">
+    SELECT
+    compra.id AS id,
+    compra.fecha AS fecha,
+    proveedor.id AS id_proveedor,
+    proveedor.email AS email_proveedor,
+    proveedor.nombre AS nombre_proveedor,
+    proveedor.telefono AS telefono_proveedor,
+    productocomprado.id as id_pc,
+    productocomprado.cantidad as cantidad,
+    productocomprado.producto as id_producto,
+    producto.descripcion as descripcion_producto,
+    producto.nombre as nombre_producto,
+    producto.precio as precio_producto,
+    producto.id_proveedor as proveedor_producto
+    FROM compra LEFT OUTER JOIN proveedor on compra.id_proveedor = proveedor.id
+    left outer join compras_productos on compras_productos.id_compra = compra.id
+    left outer join productocomprado on productocomprado.id = compras_productos.id_productocomprado
+    left outer join producto on productocomprado.producto = producto.id
+
+    </sql>
+    <select id="findAllOrderedByName" parameterType="map" flushCache="true"
+            resultMap="compraResult">
+        <include refid="recursoColumns" />
+        <where>
+            <if test="nombre != null">
+                AND fecha LIKE '%' || #{fecha} || '%'
+            </if>
+
+            <if test="id_proveedor != null">
+                AND compra.id_proveedor = '%' || #{id_proveedor} || '%'
+            </if>
+        </where>
+    </select>
+
+    <select id="findById" parameterType="long" resultMap="compraResult">
+        <include refid="recursoColumns" />
+        WHERE compra.id = #{id}
+    </select>
+
+    <resultMap id="compraResult" type="py.pol.una.ii.pw.model.Compra">
+        <id property="id" column="id" />
+        <result property="fecha" column="fecha"/>
+        <association property="proveedor" javaType="py.pol.una.ii.pw.model.Proveedor">
+            <id property="id" column="id_proveedor"/>
+            <result property="email" column="email_proveedor"/>
+            <result property="nombre" column="nombre_proveedor"/>
+            <result property="telefono" column="telefono_proveedor"/>
+        </association>
+        <collection javaType="ArrayList" property="productos" resultMap="ProductoCompradoResult" />
+    </resultMap>
+
+
+    <insert id="register" parameterType="py.pol.una.ii.pw.model.Compra" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="id">
+        INSERT INTO compra (fecha, id_proveedor)
+        VALUES (#{fecha},
+        #{proveedor.id})
+    </insert>
+
+    <update id="update" parameterType="py.pol.una.ii.pw.model.Compra">
+        UPDATE compra
+        SET fecha= #{fecha},
+        id_proveedor = #{proveedor.id}
+        WHERE id = #{id}
+    </update>
+
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM compra WHERE id = #{id}
+    </delete>
+
+    <resultMap id="ProductoCompradoResult" type="py.pol.una.ii.pw.model.ProductoComprado">
+        <id property="id" column="id_pc" />
+        <result property="cantidad" column="cantidad"/>
+        <association property="producto" javaType="py.pol.una.ii.pw.model.Producto">
+            <id property="id" column="id_producto"/>
+            <result property="nombre" column="nombre_producto"/>
+            <result property="descripcion" column="descripcion_producto"/>
+            <result property="precio" column="precio_producto"/>
+            <association property="proveedor" javaType="py.pol.una.ii.pw.model.Proveedor">
+                <id property="id" column="proveedor_producto"/>
+                <result property="email" column="email_proveedor"/>
+                <result property="nombre" column="nombre_proveedor"/>
+                <result property="telefono" column="telefono_proveedor"/>
+            </association>
+        </association>
+    </resultMap>
+
+    <insert id="addProducto" parameterType="map">
+        INSERT INTO compras_productos (id_compra, id_productocomprado)
+        VALUES (#{id_compra}, #{id_productocomprado});
+    </insert>
+
+    <delete id="deleteProducto" parameterType="map">
+        DELETE FROM compras_productos
+        WHERE 1=1
+        AND id_productocomprado=#{id_productocomprado}
+        AND id_compra=#{id_compra}
+    </delete>
+
+
+</mapper>
