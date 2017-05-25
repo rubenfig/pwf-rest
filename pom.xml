@@ -132,14 +132,16 @@
                 <!-- Due to Maven's lack of intelligence with EARs we need 
                     to configure the jboss-as maven plugin to skip deployment for all modules. 
                     We then enable it specifically in the ear module. -->
+
                 <plugin>
                     <groupId>org.jboss.as.plugins</groupId>
                     <artifactId>jboss-as-maven-plugin</artifactId>
-                    <version>${version.jboss.maven.plugin}</version>
+                    <version>7.9.Final</version>
                     <inherited>true</inherited>
                     <configuration>
                         <skip>true</skip>
                     </configuration>
+
                 </plugin>
             </plugins>
         </pluginManagement>

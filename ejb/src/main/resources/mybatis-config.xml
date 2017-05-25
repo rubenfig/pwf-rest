@@ -1,0 +1,30 @@
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="false"/>
+    </settings>
+    <environments default='development'>
+        <environment id='development'>
+            <transactionManager type="JDBC">
+                <property name="closeConnection" value="false"/>
+            </transactionManager>
+            <dataSource type='JNDI'>
+                <property name="data_source" value="java:jboss/datasources/backendDS"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+        <mapper resource='mappers/ClienteMapper.xml'/>
+        <mapper resource='mappers/ProveedorMapper.xml'/>
+        <mapper resource='mappers/ProductoMapper.xml'/>
+        <mapper resource='mappers/ProductoCompradoMapper.xml'/>
+        <mapper resource='mappers/PagoMapper.xml'/>
+        <mapper resource='mappers/CompraMapper.xml'/>
+        <mapper resource='mappers/VentaMapper.xml'/>
+        <mapper resource='mappers/CompraMasivaMapper.xml'/>
+        <mapper resource='mappers/VentaMasivaMapper.xml'/>
+    </mappers>
+</configuration>
