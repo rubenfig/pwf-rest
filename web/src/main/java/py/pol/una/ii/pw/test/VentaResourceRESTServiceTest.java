@@ -1,6 +1,5 @@
 package py.pol.una.ii.pw.test;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -13,24 +12,15 @@ import py.pol.una.ii.pw.rest.VentaResourceRESTService;
 import py.pol.una.ii.pw.service.VentaMasivaRegistration;
 import py.pol.una.ii.pw.service.VentaRegistration;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.*;
-import java.io.File;
-import java.io.IOException;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -133,7 +123,6 @@ public class VentaResourceRESTServiceTest extends BaseServiceTest {
         venta.setProductos(productoCompradoList);
         venta.setCliente(cliente);
 
-        ventas = new ArrayList<>();
         ventas.add(venta);
 
         when(repository.findAllOrderedById(null)).thenReturn(ventas);
