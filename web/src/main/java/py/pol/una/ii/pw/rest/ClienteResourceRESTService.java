@@ -193,12 +193,18 @@ public class ClienteResourceRESTService {
     @DELETE
     @Path("/{id:[0-9][0-9]*}")
     @Produces(MediaType.APPLICATION_JSON)
-    public void deleteClienteById(@PathParam("id") long id) {
-    	try {
-        	registration.remove(id);
-
+    public Cliente deleteClienteById(@PathParam("id") long id) {
+        Cliente cliente = null;
+        try {
+            cliente = repository.findById(id);
+            registration.remove(id);
+            if (cliente == null) {
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
         } catch (Exception e){
-        	log.info(e.toString());
+            log.info(e.toString());
+            cliente = null;
         }
+        return cliente;
     }
 }

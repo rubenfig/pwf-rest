@@ -222,6 +222,7 @@ public class ProductoResourceRESTService {
     public Producto deleteProductoById(@PathParam("id") long id) {
         Producto producto = null;
     	try {
+    	    producto = repository.findById(id);
         	registration.remove(id);
             if (producto == null) {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
