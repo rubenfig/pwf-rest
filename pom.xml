@@ -136,7 +136,7 @@
                 <plugin>
                     <groupId>org.jboss.as.plugins</groupId>
                     <artifactId>jboss-as-maven-plugin</artifactId>
-                    <version>7.9.Final</version>
+                    <version>${version.jboss.maven.plugin}</version>
                     <inherited>true</inherited>
                     <configuration>
                         <skip>true</skip>
